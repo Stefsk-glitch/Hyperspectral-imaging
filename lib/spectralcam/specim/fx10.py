@@ -1,7 +1,7 @@
 import time
 
-from spectralcam.specim.fxbase import FXBase
-from spectralcam.gentl import GCSystem
+from ...spectralcam.specim.fxbase import FXBase
+from ...spectralcam.gentl import GCSystem
 
 class FX10(FXBase):
   """Class to provide easy Python interface for Specim FX10e."""

@@ -16,8 +16,8 @@ import zipfile
 import numpy as np
 from genicam.genapi import AbstractPort, EAccessMode
 
-from spectralcam.utils import *
-from spectralcam.exceptions import *
+from ...spectralcam.utils import *
+from ...spectralcam.exceptions import *
 
 # Misc general GVCP constants
 GVCP_KEY = 0x42

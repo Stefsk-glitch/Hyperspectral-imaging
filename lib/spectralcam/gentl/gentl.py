@@ -14,10 +14,10 @@ from typing import Union
 import psutil
 from psutil._common import snicaddr
 
-from spectralcam.utils import ETH_MAX_MTU, netmask_to_short, ip_to_uint32, is_ipv4, is_normal_ip
-from spectralcam.gige import GVCP_PORT, GVCPRequestId, GVCPAck, GVCPDiscoveryAck, GVCPDiscoveryCmd, GVCPForceIPCmd
-from spectralcam.exceptions import AckError
-from spectralcam.preview import PreviewFactory
+from ...spectralcam.utils import ETH_MAX_MTU, netmask_to_short, ip_to_uint32, is_ipv4, is_normal_ip
+from ...spectralcam.gige import GVCP_PORT, GVCPRequestId, GVCPAck, GVCPDiscoveryAck, GVCPDiscoveryCmd, GVCPForceIPCmd
+from ...spectralcam.exceptions import AckError
+from ...spectralcam.preview import PreviewFactory
 
 # GenICam transport layer type codes
 TLTYPE_GIGE = "GEV"
