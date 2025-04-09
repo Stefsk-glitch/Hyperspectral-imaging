@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from spectralcam.specim import FX17
+from spectralcam.specim import FX10
 from spectralcam.gentl import GCSystem
 
 # TODO: add basic functionality to interact with the camera
