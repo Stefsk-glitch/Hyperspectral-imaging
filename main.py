@@ -1,6 +1,6 @@
 from tkinter import *
-from spectralcam.gentl.gentl import *
-from spectralcam.specim.fx10 import *
+from lib.spectralcam.gentl.gentl import *
+from lib.spectralcam.specim.fx10 import *
 
 cam = None
 

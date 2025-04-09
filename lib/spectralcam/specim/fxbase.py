@@ -8,11 +8,11 @@ import numpy as np
 from genicam.genapi import NodeMap
 from genicam.genapi import IValue, ICategory, ICommand, IEnumeration
 
-from spectralcam.utils import *
-from spectralcam.gige import GVCP, GVCPDiscoveryAck, PortGVCP, GVCP_PORT, gvsp
-from spectralcam.preview import PreviewFactory
-from spectralcam.gentl import GCDeviceInfo, DiscoverableGigeDevice
-from spectralcam.exceptions import *
+from ...spectralcam.utils import *
+from ...spectralcam.gige import GVCP, GVCPDiscoveryAck, PortGVCP, GVCP_PORT, gvsp
+from ...spectralcam.preview import PreviewFactory
+from ...spectralcam.gentl import GCDeviceInfo, DiscoverableGigeDevice
+from ...spectralcam.exceptions import *
 
 class FXBase(DiscoverableGigeDevice):
   """
