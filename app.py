@@ -2,7 +2,7 @@ from tkinter import *
 from camera_connector import CameraConnector
 
 class ConfigurationApp():
-    def start(self):
+    def __init__(self):
         window = Tk()
         window.geometry("600x400")
         self.camera_connector = CameraConnector()
