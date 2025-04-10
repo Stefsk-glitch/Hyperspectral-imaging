@@ -573,42 +573,17 @@ class GCSystem:
 
     # No devices was found
     if len(dev_list) == 0:
-      print("No cameras found!")
-      print(f"Make sure that:")
-      print("  - Network cable is connected.")
-      print("  - IP address of the camera is in the same network than the host computer.")
-      print(f"  - Computer allows incoming UDP traffic on port {GVCP_PORT} (firewall settings).")
-      print("If you don't know the IP address of the camera you can try to find it using tools like wireshark")
-      print("or you can try FORCEIP command to set IP address of the camera (see GCInterface.gvcp_forceip(...))")
+      return None, None
 
     # Found 1 matching device - open automatically
     elif not all and len(dev_list) == 1:
-      print(f"Found 1 matching camera")
       dev_id, inf = dev_list[0]
-      dev_info = inf.get_device_info(dev_id)
       open_device = inf.open_device(dev_id, device_type, GVCP_PORT, self.preview_factory)
       open_interface = inf
-      if open_device.is_open:
-        print(f"Connected to {dev_info.device.mac_address}")
 
-    # Found more than 1 device - ask user what to do
+    # Found more than 1 device
     else:
-      print(f"Found {len(dev_list)} cameras")
-      dev_num = 1
-      for dev_id, inf in dev_list:
-        dev_info = inf.get_device_info(dev_id)
-        print(f"  Device {dev_num}")
-        print(f"    Vendor:      {dev_info.device.manufacturer_name}")
-        print(f"    Model:       {dev_info.device.model_name}")
-        print(f"    MAC-address: {dev_info.device.mac_address}")
-        dev_num += 1
-      print("")
-      input_num = input("Enter number to open camera: ")
-      dev_id, inf = dev_list[input_num - 1]
-      open_device = inf.open_device(dev_id, device_type, GVCP_PORT, self.preview_factory)
-      open_interface = inf
-      if open_device.is_open:
-        print("Connected")
+      return None, None
 
     # Close unnecessary interfaces
     for inf in inf_list:
