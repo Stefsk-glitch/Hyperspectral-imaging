@@ -23,6 +23,9 @@ class ConfigurationApp():
         quickInitButton = Button(self.window, text="Quick Init", command=self.camera_connector.quick_init_camera)
         quickInitButton.grid(row=2, column=0, sticky=W)
 
+        # closeButton = Button(self.window, text="Close connection", command=self.camera_connector.close)
+        # closeButton.grid(row=3, column=0, sticky=W)
+
         self.window.mainloop()
 
     def message_box(self, text):

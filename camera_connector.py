@@ -15,8 +15,8 @@ class CameraConnector:
             self.app.message_box("No cam detected")
         elif not self.intf:
             self.app.message_box("No interface detected")
-        elif len(system.discover(FX10)[0]) > 1:
-            self.app.message_box("Multiple cams detected, only connect 1 cam")
+        # elif len(system.discover(FX10)[0]) > 1:
+        #     self.app.message_box("Multiple cams detected, only connect 1 cam")
         else:
             self.app.set_connection_status(True)
             self.app.message_box("Cam found")
@@ -24,6 +24,8 @@ class CameraConnector:
     def quick_init_camera(self):
         if self.cam:
             self.cam.quick_init()
+        else:
+            self.app.message_box("No cam to quick init")
     
     def get_settings(self):
         # todo: get settings here, fxbase contains lots of functions for this
@@ -32,3 +34,7 @@ class CameraConnector:
     def get_info(self):
         if self.cam:
             self.cam.get_info()
+
+    def close(self):
+        if self.cam:
+            self.cam.close()
