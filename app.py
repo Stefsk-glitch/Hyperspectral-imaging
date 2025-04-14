@@ -1,38 +1,34 @@
-from tkinter import *
-from tkinter import messagebox
-from camera_connector import CameraConnector
+from tkinter import Tk, Label, Button, W, messagebox
+import camera_connector
 
-class ConfigurationApp():
-    def __init__(self):
-        camera_connector = CameraConnector(self)
+def run_app():
+    window = Tk()
+    window.geometry("600x400")
+    window.columnconfigure(0, minsize=300)
+    window.columnconfigure(1, minsize=300)
+    window.title("FX10 Configuration App")
 
-        self.window = Tk()
-        self.window.geometry("600x400")
-        self.window.columnconfigure(0, minsize=300)
-        self.window.columnconfigure(1, minsize=300)
-        self.window.title("FX10 Configuration App")
+    connection_label = Label(window)
+    connection_label.grid(row=1, column=0, sticky=W)
+    connection_label.config(text="Connection status: Disconnected")
 
-        self.connectionLabel = Label(self.window)
-        self.connectionLabel.grid(row=1, column=0, sticky=W)
-        self.set_connection_status(False)
-        settingsLabel = Label(self.window, text="Settings", font=("", 20))
-        settingsLabel.grid(row=5, column=0, sticky=W)
+    camera_data = {""}
 
-        connectButton = Button(self.window, text="Connect FX10", command=camera_connector.connect)
-        connectButton.grid(row=0, column=0, sticky=W)
-        quickInitButton = Button(self.window, text="Quick Init", command=camera_connector.quick_init_camera)
-        quickInitButton.grid(row=2, column=0, sticky=W)
-
-        # closeButton = Button(self.window, text="Close connection", command=self.camera_connector.close)
-        # closeButton.grid(row=3, column=0, sticky=W)
-
-        self.window.wait_window()
-
-    def message_box(self, text):
+    def message_box(text):
         messagebox.showinfo("Message", text)
 
-    def set_connection_status(self, connected):
-        if connected == True:
-            self.connectionLabel.config(text="Connection status: Connected")
-        else:
-            self.connectionLabel.config(text="Connection status: Disconnected")
+    def set_connection_status(connected):
+        status = "Connected" if connected else "Disconnected"
+        connection_label.config(text=f"Connection status: {status}")
+
+    app_context = {
+        "camera_data": camera_data,
+        "message_box": message_box,
+        "set_connection_status": set_connection_status
+    }
+
+    Label(window, text="Settings", font=("", 20)).grid(row=5, column=0, sticky=W)
+    Button(window, text="Connect FX10", command=lambda: camera_connector.connect(app_context)).grid(row=0, column=0, sticky=W)
+    Button(window, text="Quick Init", command=lambda: camera_connector.quick_init_camera(app_context)).grid(row=2, column=0, sticky=W)
+
+    window.mainloop()

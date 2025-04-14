@@ -1,8 +1,4 @@
-from app import ConfigurationApp
-from camera_connector import *
+from app import run_app
 
 if __name__ == "__main__":
-    app = ConfigurationApp()
-    # camera = CameraConnector()
-    # camera.connect()
-    # camera.quick_init_camera()
+    run_app()
