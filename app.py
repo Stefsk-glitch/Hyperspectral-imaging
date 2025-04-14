@@ -4,7 +4,7 @@ from camera_connector import CameraConnector
 
 class ConfigurationApp():
     def __init__(self):
-        self.camera_connector = CameraConnector(self)
+        camera_connector = CameraConnector(self)
 
         self.window = Tk()
         self.window.geometry("600x400")
@@ -18,15 +18,15 @@ class ConfigurationApp():
         settingsLabel = Label(self.window, text="Settings", font=("", 20))
         settingsLabel.grid(row=5, column=0, sticky=W)
 
-        connectButton = Button(self.window, text="Connect FX10", command=self.camera_connector.connect)
+        connectButton = Button(self.window, text="Connect FX10", command=camera_connector.connect)
         connectButton.grid(row=0, column=0, sticky=W)
-        quickInitButton = Button(self.window, text="Quick Init", command=self.camera_connector.quick_init_camera)
+        quickInitButton = Button(self.window, text="Quick Init", command=camera_connector.quick_init_camera)
         quickInitButton.grid(row=2, column=0, sticky=W)
 
         # closeButton = Button(self.window, text="Close connection", command=self.camera_connector.close)
         # closeButton.grid(row=3, column=0, sticky=W)
 
-        self.window.mainloop()
+        self.window.wait_window()
 
     def message_box(self, text):
         messagebox.showinfo("Message", text)

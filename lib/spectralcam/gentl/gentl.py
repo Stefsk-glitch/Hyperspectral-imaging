@@ -577,9 +577,14 @@ class GCSystem:
 
     # Found 1 matching device - open automatically
     elif not all and len(dev_list) == 1:
+      print(f"Found 1 matching camera")
       dev_id, inf = dev_list[0]
+      dev_info = inf.get_device_info(dev_id)
       open_device = inf.open_device(dev_id, device_type, GVCP_PORT, self.preview_factory)
       open_interface = inf
+      if open_device.is_open:
+        print(f"Connected to {dev_info.device.mac_address}")
+
 
     # Found more than 1 device
     else:

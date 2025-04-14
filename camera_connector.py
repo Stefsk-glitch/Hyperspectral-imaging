@@ -1,5 +1,7 @@
 from lib.spectralcam.gentl.gentl import *
-from lib.spectralcam.specim.fx10 import *
+from lib.spectralcam.specim.fx10 import * 
+
+import threading
 
 class CameraConnector:
     def __init__(self, app=None):
@@ -18,12 +20,24 @@ class CameraConnector:
         # elif len(system.discover(FX10)[0]) > 1:
         #     self.app.message_box("Multiple cams detected, only connect 1 cam")
         else:
+            # print()
             self.app.set_connection_status(True)
             self.app.message_box("Cam found")
 
     def quick_init_camera(self):
         if self.cam:
-            self.cam.quick_init()
+
+            self.cam.set_defaults(frame_rate=15.0, exposure_time=30000.0) # Not necessary if you know what you are doing
+
+            # Here you can make all sorts of configurations
+            self.cam.set("BinningHorizontal", 2)
+
+
+            self.cam.open_stream() # You need to open the stream channel to be able to acquire images
+
+            self.cam.show_preview() # Show preview window
+            self.cam.start_acquire(True)
+
         else:
             self.app.message_box("No cam to quick init")
     
