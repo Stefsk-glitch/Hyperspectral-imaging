@@ -2,7 +2,10 @@ from lib.spectralcam.gentl.gentl import GCSystem
 from lib.spectralcam.specim.fx10 import FX10
 
 def connect(app):
-    system = GCSystem()
+    if app["camera_data"].get("system") is None:
+        app["camera_data"]["system"] = GCSystem()
+
+    system = app["camera_data"]["system"]
     cam, intf = system.discover(FX10)
 
     if not cam:
@@ -14,7 +17,6 @@ def connect(app):
         app["message_box"]("Cam found")
         app["camera_data"]["cam"] = cam
         app["camera_data"]["intf"] = intf
-
 
 def quick_init_camera(app):
     cam = app["camera_data"].get("cam")
@@ -28,8 +30,7 @@ def quick_init_camera(app):
     cam.open_stream()
     cam.show_preview()
     cam.start_acquire(True)
-
-
+    
 def get_info(app):
     cam = app["camera_data"].get("cam")
     if cam:
