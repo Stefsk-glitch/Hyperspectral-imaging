@@ -12,7 +12,9 @@ def run_app():
     connection_label.grid(row=1, column=0, sticky=W)
     connection_label.config(text="Connection status: Disconnected")
 
-    camera_data = {}
+    camera_data = {
+        "system": None
+    }
 
     def message_box(text):
         messagebox.showinfo("Message", text)
