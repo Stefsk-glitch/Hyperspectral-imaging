@@ -29,8 +29,11 @@ def run_app():
         "set_connection_status": set_connection_status
     }
 
-    Label(window, text="Settings", font=("", 20)).grid(row=5, column=0, sticky=W)
+    Label(window, text="Settings", font=("", 20)).grid(row=6, column=0, sticky=W)
     Button(window, text="Connect FX10", command=lambda: camera_connector.connect(app_context)).grid(row=0, column=0, sticky=W)
     Button(window, text="Quick Init", command=lambda: camera_connector.quick_init_camera(app_context)).grid(row=2, column=0, sticky=W)
+    Button(window, text="Extract Data", command=lambda: camera_connector.stop_data(app_context)).grid(row=3, column=0, sticky=W)
+    Button(window, text="Get settings", command=lambda: camera_connector.get_settings(app_context)).grid(row=4, column=0, sticky=W)
+    Button(window, text="Exit", command=lambda: camera_connector.close(app_context)).grid(row=5, column=0, sticky=W)
 
     window.mainloop()
