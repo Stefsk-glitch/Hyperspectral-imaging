@@ -42,10 +42,7 @@ def stop_data(app):
     thread.start()
 
 def save_data(data, app):
-    np.set_printoptions(threshold=np.inf)
-    with open("data.txt", "w") as f:
-        f.write(np.array2string(data))
-
+    np.save("data.npy", data)
     app["message_box"]("Finished saving data")
 
 def get_settings(app):
