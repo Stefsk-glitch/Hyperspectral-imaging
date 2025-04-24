@@ -33,10 +33,10 @@ def quick_init_camera(app):
     cam.show_preview()
     cam.start_acquire(True)
 
-def stop_data(app):
+def extract_data(app):
     cam = app["camera_data"].get("cam")
     if not cam:
-        app["message_box"]("No cam to quick init")
+        app["message_box"]("No cam to extract data from")
         return
     data = cam.stop_acquire()
     thread = threading.Thread(target = save_data, args = (data, app, ))
@@ -49,7 +49,7 @@ def save_data(data, app):
 
     app["message_box"]("Finished saving data")
 
-def get_settings(app):
+def get_categories(app):
     cam = app["camera_data"].get("cam")
     if not cam:
         app["message_box"]("No cam to get categories")
@@ -66,9 +66,8 @@ def close(app):
     try:
         cam = app["camera_data"].get("cam")
         if cam:
-            result = cam.close()
-            if (result == True):
-                canClose = True
+            cam.close()
+        canClose = True
     except NotConnectedError:
         # todo: debug, remove in final version
         app["message_box"]("Cam was not connected")
