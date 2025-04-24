@@ -143,8 +143,8 @@ class FXBase(DiscoverableGigeDevice):
       self.gvcp.disconnect()
     if self.preview != None:
       self.preview.hide()
-    if self._verbose:
-      print("FX: Device closed")
+    print("FX: Device closed")
+    return True
 
   def get_node(self, name: Union[str, int]) -> Union[IValue, None]:
     """
