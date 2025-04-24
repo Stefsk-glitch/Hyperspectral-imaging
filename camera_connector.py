@@ -1,5 +1,6 @@
 from lib.spectralcam.gentl.gentl import GCSystem
 from lib.spectralcam.specim.fx10 import FX10
+from lib.spectralcam.exceptions import *
 import numpy as np
 import threading
 
@@ -61,6 +62,19 @@ def get_info(app):
         cam.get_info()
 
 def close(app):
-    cam = app["camera_data"].get("cam")
-    if cam:
-        cam.close_stream()
+    canClose = False
+    try:
+        cam = app["camera_data"].get("cam")
+        if cam:
+            result = cam.close()
+            if (result == True):
+                canClose = True
+    except NotConnectedError:
+        # todo: debug, remove in final version
+        app["message_box"]("Cam was not connected")
+        canClose = True
+    except AckError:
+        app["message_box"]("Problem with an acknowledgement from the camera")
+    finally:
+        if (canClose == True):
+            app["close_app"]()
