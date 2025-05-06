@@ -26,4 +26,11 @@ Type ```pip install -r requirements.txt``` </br>
 - ```pip install -r requirements.txt```
 
 ## Run the app
-Inside of venv environment, run: ```python main.py```
+- Inside of venv environment, run: ```python main.py```<br>
+
+The app may not find any camera's. Set network settings to local link only for ethernet.
+- Make sure port 3956 is allowed through firewall
+    - Check if UFW is installed: ```sudo ufw status```
+    - If it is not installed: ```sudo apt install ufw```
+    - Enable UFW: ```sudo ufw enable```
+    - Allow port 3956: ```sudo ufw allow 3956```
