@@ -14,9 +14,9 @@ Type ```pip install -r requirements.txt``` </br>
 # Running the app on Linux
 ## Install Python 3.10.16
 - ```wget https://www.python.org/ftp/python/3.10.16/Python-3.10.16.tgz```
-```tar xzf Python-3.10.16.tgz```
-```cd Python-3.10.16```
-```sudo apt install tk-dev tcl-dev```
+- ```tar xzf Python-3.10.16.tgz```
+- ```cd Python-3.10.16```
+- ```sudo apt install tk-dev tcl-dev```
 - ```./configure --enable-optimizations```
 - ```sudo make altinstall```
 
@@ -34,3 +34,6 @@ The app may not find any camera's. Set network settings to local link only for e
     - If it is not installed: ```sudo apt install ufw```
     - Enable UFW: ```sudo ufw enable```
     - Allow port 3956: ```sudo ufw allow 3956```
+- Internet settings should look something like this:
+![alt text](readme_attributes/image.png)
+![alt text](readme_attributes/image-1.png)
