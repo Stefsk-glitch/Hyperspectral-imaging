@@ -18,6 +18,7 @@ from ...spectralcam.utils import ETH_MAX_MTU, netmask_to_short, ip_to_uint32, is
 from ...spectralcam.gige import GVCP_PORT, GVCPRequestId, GVCPAck, GVCPDiscoveryAck, GVCPDiscoveryCmd, GVCPForceIPCmd
 from ...spectralcam.exceptions import AckError
 from ...spectralcam.preview import PreviewFactory
+from event_handler import fire_event, Events
 
 # GenICam transport layer type codes
 TLTYPE_GIGE = "GEV"
@@ -573,21 +574,22 @@ class GCSystem:
 
     # No devices was found
     if len(dev_list) == 0:
+      fire_event(Events.NO_CAM)
       return None, None
 
     # Found 1 matching device - open automatically
     elif not all and len(dev_list) == 1:
-      print(f"Found 1 matching camera")
       dev_id, inf = dev_list[0]
       dev_info = inf.get_device_info(dev_id)
       open_device = inf.open_device(dev_id, device_type, GVCP_PORT, self.preview_factory)
       open_interface = inf
       if open_device.is_open:
         print(f"Connected to {dev_info.device.mac_address}")
-
+        fire_event(Events.CAM_FOUND, (open_device, open_interface))
 
     # Found more than 1 device
     else:
+      fire_event(Events.MULTIPLE_CAMS)
       return None, None
 
     # Close unnecessary interfaces
