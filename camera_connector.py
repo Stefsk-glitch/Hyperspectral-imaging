@@ -4,19 +4,20 @@ from lib.spectralcam.exceptions import *
 import numpy as np
 import threading
 from enum import Enum
-import event_handler
 from context import app_context
+from enums import ConnectionState
 
 def connect():
     if app_context["camera_data"].get("system") is None:
         app_context["camera_data"]["system"] = GCSystem()
-    
+
     thread = threading.Thread(target=find_and_connect_camera)
     thread.start()
 
 def find_and_connect_camera():
     system = app_context["camera_data"]["system"]
     system.discover(FX10)
+    app_context["set_connection_state"](ConnectionState.CONNECTING)
 
 def quick_init_camera():
     cam = app_context["camera_data"].get("cam")

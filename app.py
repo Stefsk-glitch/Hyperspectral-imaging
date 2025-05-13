@@ -3,6 +3,7 @@ from settings import open_settings_window
 from lib.spectralcam.gentl.gentl import GCSystem, GCDevice
 from context import app_context
 import camera_connector, event_handler
+from enums import ConnectionState
 
 def run_app():
     window = Tk()
@@ -29,8 +30,15 @@ def run_app():
     def message_box(text):
         messagebox.showinfo("Message", text)
 
-    def set_connection_status(connected):
-        status = "Connected" if connected else "Disconnected"
+    def set_connection_state(connected: ConnectionState):
+        status = ""
+        match connected:
+            case ConnectionState.DISCONNECTED:
+                status = "Disconnected"
+            case ConnectionState.CONNECTING:
+                status = "Connecting..."
+            case ConnectionState.CONNECTED:
+                status = "Connected"
         connection_label.config(text=f"Connection status: {status}")
 
     def close_app():
@@ -44,7 +52,7 @@ def run_app():
     app_context.update({
         "camera_data": camera_data,
         "message_box": message_box,
-        "set_connection_status": set_connection_status,
+        "set_connection_state": set_connection_state,
         "close_app": close_app
     })
 
@@ -70,7 +78,7 @@ def run_app():
         match event:
             case event_handler.Events.CAM_FOUND:
                 cam, intf = args
-                set_connection_status(True)
+                set_connection_state(ConnectionState.CONNECTED)
                 app_context["camera_data"]["cam"] = cam
                 app_context["camera_data"]["intf"] = intf
                 set_buttons(NORMAL)

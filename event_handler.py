@@ -1,4 +1,4 @@
-from enum import Enum
+from enums import Events
 
 listeners = []
 
@@ -12,7 +12,3 @@ def fire_event(event, *args):
     for listener in listeners:
         listener(event, *args)
 
-class Events(Enum):
-    CAM_FOUND = 1,
-    MULTIPLE_CAMS = 2,
-    NO_CAM = 3
