@@ -50,7 +50,7 @@ def extract_data():
         app_context["message_box"]("No cam to extract data from")
         return
     data = cam.stop_acquire()
-    thread = threading.Thread(target = save_data, args = (data, app_context, ))
+    thread = threading.Thread(target = save_data, args = (data, ))
     thread.start()
 
 def save_data(data):
