@@ -574,7 +574,7 @@ class GCSystem:
 
     # No devices was found
     if len(dev_list) == 0:
-      fire_event(Events.NO_CAM)
+      fire_event(Events.NO_CAM, None)
       return None, None
 
     # Found 1 matching device - open automatically
@@ -589,7 +589,7 @@ class GCSystem:
 
     # Found more than 1 device
     else:
-      fire_event(Events.MULTIPLE_CAMS)
+      fire_event(Events.MULTIPLE_CAMS, None)
       return None, None
 
     # Close unnecessary interfaces

@@ -1,8 +1,8 @@
-from tkinter import Tk, Label, Button, W, messagebox, Frame, SE, Toplevel
+from tkinter import Tk, Label, Button, W, messagebox, Frame, SE, NORMAL, DISABLED
 from settings import open_settings_window
 from lib.spectralcam.gentl.gentl import GCSystem, GCDevice
 from context import app_context
-import camera_connector
+import camera_connector, event_handler
 
 def run_app():
     window = Tk()
@@ -49,12 +49,43 @@ def run_app():
     })
 
     Label(frame, text="FX10 Configuration app", font=("", 22)).grid(row=0, column=0, sticky=W)
-    Button(frame, text="Connect FX10", command=camera_connector.connect).grid(row=1, column=0, sticky=W)
-    Button(frame, text="Quick Init", command=camera_connector.quick_init_camera).grid(row=3, column=0, sticky=W)
-    Button(frame, text="Extract Data", command=camera_connector.extract_data).grid(row=4, column=0, sticky=W)
+    connect_button = Button(frame, text="Connect FX10", command=camera_connector.connect)
+    connect_button.grid(row=1, column=0, sticky=W)
+
+    quick_init_button = Button(frame, text="Quick Init", command=camera_connector.quick_init_camera)
+    quick_init_button.grid(row=3, column=0, sticky=W)
+
+    extract_data_button = Button(frame, text="Extract Data", command=camera_connector.extract_data)
+    extract_data_button.grid(row=4, column=0, sticky=W)
+
     Button(window, text="Close App", command=camera_connector.close).grid(row=1, column=1, sticky=SE, padx=10, pady=10)
     Label(frame, text="Settings", font=("", 20)).grid(row=7, column=0, sticky=W)
-    Button(frame, text="Get settings", command=camera_connector.get_categories).grid(row=8, column=0, sticky=W)
-    Button(frame, text="Open settings", command=lambda: open_settings_window(window)).grid(row=9, column=0, sticky=W)
 
+    settings_button = Button(frame, text="Open settings", command=lambda: open_settings_window(window))
+    settings_button.grid(row=9, column=0, sticky=W)
+
+    buttons = [quick_init_button, extract_data_button, settings_button]
+
+    def cam_event(event: event_handler.Events, args):
+        match event:
+            case event_handler.Events.CAM_FOUND:
+                cam, intf = args
+                set_connection_status(True)
+                app_context["camera_data"]["cam"] = cam
+                app_context["camera_data"]["intf"] = intf
+                set_buttons(NORMAL)
+            case event_handler.Events.MULTIPLE_CAMS:
+                app_context["message_box"]("Found multiple cams. This app does not support multiple cams yet")
+            case event_handler.Events.NO_CAM:
+                app_context["message_box"]("No cams found")
+
+    def set_buttons(state):
+        if state is NORMAL:
+            connect_button.config(state=DISABLED)
+        for button in buttons:
+            button.config(state=state)
+
+    event_handler.add_listener(cam_event)    
+
+    set_buttons(DISABLED)
     window.mainloop()

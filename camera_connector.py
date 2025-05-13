@@ -11,27 +11,12 @@ def connect():
     if app_context["camera_data"].get("system") is None:
         app_context["camera_data"]["system"] = GCSystem()
     
-    event_handler.add_listener(cam_event)
-
     thread = threading.Thread(target=find_and_connect_camera)
     thread.start()
 
 def find_and_connect_camera():
     system = app_context["camera_data"]["system"]
     system.discover(FX10)
-
-def cam_event(event: event_handler.Events, args):
-    match event:
-        case event_handler.Events.CAM_FOUND:
-            cam, intf = args
-            app_context["set_connection_status"](True)
-            app_context["message_box"]("Cam found")
-            app_context["camera_data"]["cam"] = cam
-            app_context["camera_data"]["intf"] = intf
-        case event_handler.Events.MULTIPLE_CAMS:
-            app_context["message_box"]("Found multiple cams. This app does not support multiple cams yet")
-        case event_handler.Events.NO_CAM:
-            app_context["message_box"]("No cams found")
 
 def quick_init_camera():
     cam = app_context["camera_data"].get("cam")
