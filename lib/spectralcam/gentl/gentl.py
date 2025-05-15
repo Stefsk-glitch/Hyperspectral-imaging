@@ -51,6 +51,14 @@ class GCDeviceInfo:
     result += "Device:\n"
     result += "\n".join(list(map(lambda row: (f"  {row}"), str(self.device).split("\n"))))
     return result
+  
+  def get_app_info(self) -> str:
+    result = "Info:\n"
+    result += f"Mac Address: {self.device.mac_address}\n"
+    result += f"Manufacturer: {self.device.manufacturer_name}\n"
+    result += f"Device Model: {self.device.model_name}\n"
+    result += f"Serial Number: {self.device.serial_number}\n"
+    return result
 
   def get(self, cmd: int) -> Union[str, int]:
     """

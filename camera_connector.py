@@ -54,16 +54,10 @@ def get_categories():
 def show_info(master):
     win = Toplevel(master)
     win.title("Camera Information")
-    # win.size("300x300")
 
-    intf: GCInterface = app_context["camera_data"]["intf"]
-    # print(intf.get_device_info())
     dev: GCDevice = app_context["camera_data"]["cam"]
-
-    ip_label = Label(win, text=intf.get_info())
-    ip_label.grid(row=1, column=1)
-    mac_label = Label(win, text=f"Mac address: {intf.get_device_id(0)}")
-    mac_label.grid(row=2, column=1)
+    info_label = Label(win, text=dev._info.get_app_info())
+    info_label.grid(row=3, column=1, sticky=W)
 
 def close():
     canClose = False
