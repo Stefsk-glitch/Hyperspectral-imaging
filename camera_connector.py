@@ -3,9 +3,10 @@ from lib.spectralcam.specim.fx10 import FX10
 from lib.spectralcam.exceptions import *
 import numpy as np
 import threading
-from enum import Enum
 from context import app_context
 from enums import ConnectionState
+from lib.spectralcam.gentl import GCDevice, GCInterface
+from tkinter import Toplevel, Label, W
 
 def connect():
     if app_context["camera_data"].get("system") is None:
@@ -16,7 +17,7 @@ def connect():
 
 def find_and_connect_camera():
     app_context["set_connection_state"](ConnectionState.CONNECTING)
-    system = app_context["camera_data"]["system"]
+    system: GCSystem = app_context["camera_data"]["system"]
     system.discover(FX10)
 
 def quick_init_camera():
@@ -50,10 +51,19 @@ def get_categories():
         return
     cam.get_features()
 
-def get_info():
-    cam = app_context["camera_data"].get("cam")
-    if cam:
-        cam.get_info()
+def show_info(master):
+    win = Toplevel(master)
+    win.title("Camera Information")
+    # win.size("300x300")
+
+    intf: GCInterface = app_context["camera_data"]["intf"]
+    # print(intf.get_device_info())
+    dev: GCDevice = app_context["camera_data"]["cam"]
+
+    ip_label = Label(win, text=intf.get_info())
+    ip_label.grid(row=1, column=1)
+    mac_label = Label(win, text=f"Mac address: {intf.get_device_id(0)}")
+    mac_label.grid(row=2, column=1)
 
 def close():
     canClose = False

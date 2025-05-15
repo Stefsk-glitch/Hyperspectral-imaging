@@ -124,9 +124,9 @@ class GCInterfaceInfo:
     self.addrs = addrs
 
   def __str__(self) -> str:
-    result = f"GCInterfaceInfo: interface {self.name}"
+    result = f"Interface: {self.name}"
     for addr in self.addrs:
-      result += f"\n  {addr.family.name} {addr.address}/{netmask_to_short(addr.netmask)}"
+      result += f"\n IP info: {addr.family.name} {addr.address}/{netmask_to_short(addr.netmask)}"
     return result
 
   def get(self, cmd: int) -> str:
