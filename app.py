@@ -3,20 +3,20 @@ import logging
 from tkinter import Tk, Label, Button, W, messagebox, NORMAL, DISABLED
 import tkinter as tk
 from settings import open_settings_window
-from event_handler import Events
 from models import app_context, command_queue, esp32_status
 from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice, GCInterface, GCSystem
 from typing import Tuple
+from models import app_context, camera_data
 
 def run_app():
     window = Tk()
     window.geometry("800x600")
     window.title("FX10 Configuration App")
 
-    # main frame
     main_frame = tk.Frame(window)
     main_frame.pack(padx=10, pady=10, anchor="w")
+
     Label(main_frame, text="FX10 Configuration app", font=("", 22)).pack()
 
     connection_row = tk.Frame(main_frame)
@@ -26,10 +26,8 @@ def run_app():
     cam_information_button = Button(connection_row, text="Camera Info", command=lambda:camera_connector.show_info(window))
     cam_information_button.grid(row=0, column=1)
 
-    connection_info_row = tk.Frame(main_frame)
-    connection_info_row.pack(fill="x", pady=2)
-    cam_connection_label = Label(connection_info_row, text="Connection status: Disconnected")
-    cam_connection_label.grid(row=0, column=0)
+    cam_connection_label = Label(main_frame, text="Connection status: Disconnected")
+    cam_connection_label.pack(anchor="w")
 
     cam_actions_row = tk.Frame(main_frame)
     cam_actions_row.pack(fill="x", pady=2)
@@ -42,27 +40,22 @@ def run_app():
 
     settings_row = tk.Frame(main_frame)
     settings_row.pack(fill="x", pady=2)
+    settings_button = Button(settings_row, text="Open settings", command=lambda: open_settings_window(window))
+    settings_button.grid(row=9, column=0, sticky=W)
+
+    Label(main_frame, text="Opstelling", font=("", 20)).pack(anchor="w")
 
     esp32_info_row = tk.Frame(main_frame)
     esp32_info_row.pack(fill="x", pady=2)
-    Label(main_frame, text="Opstelling", font=("", 20)).pack(anchor="w")
+    connection_esp32_label = Label(esp32_info_row, text="ESP32 status: Disconnected")
+    connection_esp32_label.grid(row=0, column=0)
 
     opstelling_controls_row = tk.Frame(main_frame)
     opstelling_controls_row.pack(fill="x", pady=2)
     Button(opstelling_controls_row, text="Start scan", command=lambda: command_queue.put("start_scan")).grid(row=0, column=0, padx="5")
     Button(opstelling_controls_row, text="Stop scan", command=lambda: command_queue.put("stop_scan")).grid(row=0, column=1)
 
-    connection_esp32_label = Label(esp32_info_row, text="ESP32 status: Disconnected")
-    connection_esp32_label.grid(row=0, column=0)
-
-    
-
-    settings_button = Button(settings_row, text="Open settings", command=lambda: open_settings_window(window))
-    settings_button.grid(row=9, column=0, sticky=W)
-
-    camera_data = {
-        "system": None
-    }
+    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
 
     def message_box(text):
         messagebox.showinfo("Message", text)
@@ -80,7 +73,6 @@ def run_app():
                 status = f"Connected to {ip}"
         cam_connection_label.config(text=f"Connection status: {status}")
 
-
     def update_esp32_status():
         connected = esp32_status["connected"]
         status_text = "Connected" if connected else "Disconnected"
@@ -94,11 +86,6 @@ def run_app():
             system = camera_data["system"]
             system.close()
         exit()
-
-    app_context["message_box"] = message_box
-    app_context["set_connection_state"] = set_connection_state
-
-    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
 
     def cam_event(event: event_handler.Events, args: Tuple[GCDevice, GCInterface]):
         match event:
@@ -120,6 +107,9 @@ def run_app():
             connect_button.config(state=DISABLED)
         for button in toggleable_buttons:
             button.config(state=state)
+
+    app_context["message_box"] = message_box
+    app_context["set_connection_state"] = set_connection_state
 
     event_handler.add_listener(cam_event)    
     set_buttons(DISABLED)
