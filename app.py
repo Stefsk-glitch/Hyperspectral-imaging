@@ -1,4 +1,5 @@
 from tkinter import Tk, Label, Button, W, messagebox, Frame, SE, NORMAL, DISABLED
+import tkinter as tk
 from settings import open_settings_window
 from context import app_context
 import camera_connector, event_handler
@@ -11,17 +12,26 @@ def run_app():
     window.geometry("800x600")
     window.title("FX10 Configuration App")
 
-    window.rowconfigure(1, weight=1)
-    window.columnconfigure(1, weight=1)
+    main_frame = tk.Frame(window)
+    main_frame.pack(padx=10, pady=10, anchor="w")
 
-    frame = Frame(window, padx=10, pady=10)
-    frame.grid(row=0, column=0, sticky="nsew")
+    app_name_row = tk.Frame(main_frame)
+    app_name_row.pack(fill="x", pady=2)
 
-    right_pad = Frame(window, width=50)
-    right_pad.grid(row=0, column=1, rowspan=2, sticky="nse")
+    connection_row = tk.Frame(main_frame)
+    connection_row.pack(fill="x", pady=2)
 
-    connection_label = Label(frame, text="Connection status: Disconnected")
-    connection_label.grid(row=2, column=0, sticky=W)
+    connection_info_row = tk.Frame(main_frame)
+    connection_info_row.pack(fill="x", pady=2)
+
+    cam_actions_row = tk.Frame(main_frame)
+    cam_actions_row.pack(fill="x", pady=2)
+
+    settings_row = tk.Frame(main_frame)
+    settings_row.pack(fill="x", pady=2)
+
+    connection_label = Label(connection_info_row, text="Connection status: Disconnected")
+    connection_label.grid(row=0, column=0)
 
     camera_data = {
         "system": None,
@@ -39,40 +49,33 @@ def run_app():
             case ConnectionState.CONNECTING:
                 status = "Connecting..."
             case ConnectionState.CONNECTED:
-                status = "Connected"
+                cam: GCDevice = camera_data["cam"]
+                ip = cam._info.host_address
+                status = f"Connected to {ip}"
         connection_label.config(text=f"Connection status: {status}")
-
-    def close_app():
-        window.destroy()
-        if (camera_data["system"]):
-            system = camera_data["system"]
-            system.close()
-        exit()
 
     app_context.update({
         "camera_data": camera_data,
         "message_box": message_box,
-        "set_connection_state": set_connection_state,
-        "close_app": close_app
+        "set_connection_state": set_connection_state
     })
 
-    Label(frame, text="FX10 Configuration app", font=("", 22)).grid(row=0, column=0, sticky=W)
-    connect_button = Button(frame, text="Connect FX10", command=camera_connector.connect)
-    connect_button.grid(row=1, column=0, sticky=W)
+    Label(app_name_row, text="FX10 Configuration app", font=("", 22)).pack()
+    connect_button = Button(connection_row, text="Connect FX10", command=camera_connector.connect)
+    connect_button.grid(row=0, column=0, padx="5")
 
-    cam_information_button = Button(frame, text="Camera Info", command=lambda:camera_connector.show_info(window))
-    cam_information_button.grid(row=1, column=1, sticky=W)
+    cam_information_button = Button(connection_row, text="Camera Info", command=lambda:camera_connector.show_info(window))
+    cam_information_button.grid(row=0, column=1)
 
-    quick_init_button = Button(frame, text="Quick Init", command=camera_connector.quick_init_camera)
-    quick_init_button.grid(row=3, column=0, sticky=W)
+    quick_init_button = Button(cam_actions_row, text="Quick Init", command=camera_connector.quick_init_camera)
+    quick_init_button.grid(row=0, column=0, padx="5")
 
-    extract_data_button = Button(frame, text="Extract Data", command=camera_connector.extract_data)
-    extract_data_button.grid(row=4, column=0, sticky=W)
+    extract_data_button = Button(cam_actions_row, text="Extract Data", command=camera_connector.extract_data)
+    extract_data_button.grid(row=0, column=1)
 
-    Button(window, text="Close App", command=camera_connector.close).grid(row=1, column=1, sticky=SE, padx=10, pady=10)
-    Label(frame, text="Settings", font=("", 20)).grid(row=7, column=0, sticky=W)
+    Label(settings_row, text="Settings", font=("", 20)).grid(row=7, column=0, sticky=W)
 
-    settings_button = Button(frame, text="Open settings", command=lambda: open_settings_window(window))
+    settings_button = Button(settings_row, text="Open settings", command=lambda: open_settings_window(window))
     settings_button.grid(row=9, column=0, sticky=W)
 
     buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
@@ -101,4 +104,11 @@ def run_app():
     event_handler.add_listener(cam_event)    
     set_buttons(DISABLED)
 
+    def on_close():
+        if (camera_data["system"]):
+            system = camera_data["system"]
+            system.close()
+        exit()
+
+    window.protocol("WM_DELETE_WINDOW", on_close)
     window.mainloop()

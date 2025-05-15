@@ -74,4 +74,5 @@ def close():
         app_context["message_box"]("Problem with an acknowledgement from the camera")
     finally:
         if (canClose == True):
-            app_context["close_app"]()
+            print("can close")
+            # app_context["close_app"]()
