@@ -5,9 +5,9 @@ import threading
 import sys
 import logging
 from app import run_app
-from share import command_queue
+from models import command_queue
 from queue import Empty
-from share import command_queue, esp32_status
+from models import command_queue, esp32_status
 from pathlib import Path
 
 log_path = Path(__file__).parent / "app_log.txt"
