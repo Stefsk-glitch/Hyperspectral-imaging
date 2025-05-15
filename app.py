@@ -22,9 +22,9 @@ def run_app():
     connection_row = tk.Frame(main_frame)
     connection_row.pack(fill="x", pady=2)
     connect_button = Button(connection_row, text="Connect FX10", command=camera_connector.connect)
-    connect_button.grid(row=0, column=0, padx="5")
+    connect_button.grid(row=0, column=0)
     cam_information_button = Button(connection_row, text="Camera Info", command=lambda:camera_connector.show_info(window))
-    cam_information_button.grid(row=0, column=1)
+    cam_information_button.grid(row=0, column=1, padx="5")
 
     cam_connection_label = Label(main_frame, text="Connection status: Disconnected")
     cam_connection_label.pack(anchor="w")
@@ -32,9 +32,9 @@ def run_app():
     cam_actions_row = tk.Frame(main_frame)
     cam_actions_row.pack(fill="x", pady=2)
     quick_init_button = Button(cam_actions_row, text="Quick Init", command=camera_connector.quick_init_camera)
-    quick_init_button.grid(row=0, column=0, padx="5")
+    quick_init_button.grid(row=0, column=0)
     extract_data_button = Button(cam_actions_row, text="Extract Data", command=camera_connector.extract_data)
-    extract_data_button.grid(row=0, column=1)
+    extract_data_button.grid(row=0, column=1, padx="5")
 
     Label(main_frame, text="Settings", font=("", 20)).pack(anchor="w")
 
@@ -52,8 +52,10 @@ def run_app():
 
     opstelling_controls_row = tk.Frame(main_frame)
     opstelling_controls_row.pack(fill="x", pady=2)
-    Button(opstelling_controls_row, text="Start scan", command=lambda: command_queue.put("start_scan")).grid(row=0, column=0, padx="5")
-    Button(opstelling_controls_row, text="Stop scan", command=lambda: command_queue.put("stop_scan")).grid(row=0, column=1)
+    Button(opstelling_controls_row, text="Start scan", command=lambda: command_queue.put("start_scan")).grid(row=0, column=0)
+    Button(opstelling_controls_row, text="Stop scan", command=lambda: command_queue.put("stop_scan")).grid(row=0, column=1, padx="5")
+
+    Button(main_frame, text="n").pack(anchor="w")
 
     toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
 
