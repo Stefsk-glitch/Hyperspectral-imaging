@@ -4,7 +4,7 @@ from settings import open_settings_window
 from models import app_context
 import camera_connector, event_handler
 from enums import ConnectionState
-from lib.spectralcam.gentl import GCDevice, GCInterface
+from lib.spectralcam.gentl import GCDevice, GCInterface, GCSystem
 from typing import Tuple
 
 def run_app():
@@ -98,7 +98,7 @@ def run_app():
 
     def on_close():
         if (app_context["camera_data"]["system"]):
-            system = app_context["camera_data"]["system"]
+            system: GCSystem = app_context["camera_data"]["system"]
             system.close()
         exit()
 
