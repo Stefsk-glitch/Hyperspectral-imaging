@@ -1,3 +1,5 @@
+import queue
+
 camera_data = {
     "system": None,                 # GCSystem
     "cam": None                     # GCDevice
@@ -8,3 +10,6 @@ app_context = {
     "message_box": None,            # function to show a message box
     "set_connection_state": None    # function to set app connection state
 }
+
+command_queue = queue.Queue()
+esp32_status = {"connected": False}
