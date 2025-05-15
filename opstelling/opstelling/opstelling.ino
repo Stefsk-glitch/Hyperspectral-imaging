@@ -292,10 +292,10 @@ void loop() {
 
 // Interrupt service function (ISR)
 void handleStopButton() {
-    currentState = SafeStop;
-    motor.stop();
-    FirstInteruptStopButton = true;
-    }
+  currentState = SafeStop;
+  motor.stop();
+  FirstInteruptStopButton = true;
+}
 
 // Function for showing string program status in screen 
 String stateToString(State state) {
@@ -323,7 +323,18 @@ void handleSerial3() {
                 Serial.println(cmd);
 
                 if (strcmp(cmd, "start_scan") == 0) {
-                    StartButton = true;
+                  StartButton = true;
+                }
+
+                if (strcmp(cmd, "stop_scan") == 0) {
+                  currentState = SafeStop;
+                  motor.stop();
+                  FirstInteruptStopButton = true;
+                  motor.resetMotor();
+                  
+                  currentState = Waiting; 
+                  StringCurrentState = stateToString(currentState);
+                  display.mainMenu();
                 }
 
                 // Respond with ack
@@ -338,8 +349,8 @@ void handleSerial3() {
             serial3Buffer = ""; // Reset buffer
         } else {
             serial3Buffer += c;
-            // Optional: prevent buffer overflow
-            if (serial3Buffer.length() > 200) {
+            // prevent buffer overflow
+            if (serial3Buffer.length() > 50) {
                 serial3Buffer = "";
             }
         }

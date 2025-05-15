@@ -1,5 +1,7 @@
-from tkinter import Tk, Label, Button, W, messagebox, Frame, SE
 import camera_connector
+import logging
+from tkinter import Tk, Label, Button, W, messagebox, Frame, SE
+from share import command_queue, esp32_status
 
 def run_app():
     window = Tk()
@@ -18,6 +20,9 @@ def run_app():
     connection_label = Label(frame, text="Connection status: Disconnected")
     connection_label.grid(row=2, column=0, sticky=W)
 
+    connection_esp32_label = Label(frame, text="ESP32 status: Disconnected")
+    connection_esp32_label.grid(row=10, column=0, sticky=W)
+
     camera_data = {
         "system": None
     }
@@ -29,8 +34,15 @@ def run_app():
         status = "Connected" if connected else "Disconnected"
         connection_label.config(text=f"Connection status: {status}")
 
+    def update_esp32_status():
+        connected = esp32_status["connected"]
+        status_text = "Connected" if connected else "Disconnected"
+        connection_esp32_label.config(text=f"ESP32 status: {status_text}")
+        window.after(500, update_esp32_status)
+
     def close_app():
-        print("destroy")
+        logging.info("destroy")
+
         window.destroy()
         if (camera_data["system"]):
             system = camera_data["system"]
@@ -51,5 +63,9 @@ def run_app():
     Button(window, text="Close App", command=lambda: camera_connector.close(app_context)).grid(row=1, column=1, sticky=SE, padx=10, pady=10)
     Label(frame, text="Settings", font=("", 20)).grid(row=7, column=0, sticky=W)
     Button(frame, text="Get settings", command=lambda: camera_connector.get_categories(app_context)).grid(row=8, column=0, sticky=W)
+    Label(frame, text="Opstelling", font=("", 20)).grid(row=9, column=0, sticky=W)
+    Button(frame, text="Start scan", command=lambda: command_queue.put("start_scan")).grid(row=11, column=0, sticky=W)
+    Button(frame, text="Stop scan", command=lambda: command_queue.put("stop_scan")).grid(row=12, column=0, sticky=W)
 
+    update_esp32_status()
     window.mainloop()
