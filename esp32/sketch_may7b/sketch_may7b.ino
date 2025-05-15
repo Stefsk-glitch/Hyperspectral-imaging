@@ -2,10 +2,12 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "xxx";
-const char* password = "xxx";
+const char* ssid = "xxxx";
+const char* password = "xxxx";
 const char* websocket_host = "192.168.137.xxx";
 const uint16_t websocket_port = xxxx;
+
+bool stopScan = false;
 
 WebSocketsClient webSocket;
 
@@ -54,6 +56,25 @@ void setup() {
 
 void loop() {
   webSocket.loop();
+
+  bool wifiOk = (WiFi.status() == WL_CONNECTED);
+
+  if (!wifiOk && !stopScan) {
+    Serial.println("Connection lost. Sending stop_scan...");
+
+    StaticJsonDocument<100> stopCmd;
+    stopCmd["cmd"] = "stop_scan";
+    String json;
+    serializeJson(stopCmd, json);
+
+    serializeJson(stopCmd, Serial2);
+    Serial2.println();
+
+    stopScan = true;
+  }
+  else{
+    stopScan = false;
+  }
 
   if (Serial2.available()) {
     String msg = Serial2.readStringUntil('\n');
