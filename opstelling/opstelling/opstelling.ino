@@ -322,9 +322,9 @@ void handleSerial3() {
                 Serial.print("Mega Command received: ");
                 Serial.println(cmd);
 
-                // if (strcmp(cmd, "start_scan") == 0) {
-                    
-                // }
+                if (strcmp(cmd, "start_scan") == 0) {
+                    StartButton = true;
+                }
 
                 // Respond with ack
                 StaticJsonDocument<200> ackDoc;
