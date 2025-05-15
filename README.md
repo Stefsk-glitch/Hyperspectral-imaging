@@ -1,6 +1,8 @@
 # Hyperspectral-imaging
 FX10 Camera made by Specim
 
+Opstelling's code is from: https://github.com/Momin2004/Hyperspectral-imaging-lab
+
 # Using the project
 Install Anaconda using: https://www.anaconda.com/download/success </br>
 Open Anaconda Prompt </br>
