@@ -5,7 +5,7 @@ import numpy as np
 import threading
 from models import app_context
 from enums import ConnectionState
-from lib.spectralcam.gentl import GCDevice, GCInterface
+from lib.spectralcam.gentl import GCDevice
 from tkinter import Toplevel, Label, W
 
 def connect():

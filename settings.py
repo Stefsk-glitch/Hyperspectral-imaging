@@ -1,8 +1,8 @@
 from tkinter import Toplevel
-from models import app_context
+from models import app_context, camera_data
 
-def on_open(app_context):
-    camera = app_context["camera_data"]["cam"]
+def on_open():
+    camera = camera_data["cam"]
     features = camera.get_features()
     for feature in features:
         try:
@@ -16,8 +16,7 @@ def on_open(app_context):
 def open_settings_window(master):
     win = Toplevel(master)
     win.title("Settings")
-    if app_context['camera_data']['cam'] is None:
-        app_context['message_box']("Cam is not connected")
+    if camera_data["cam"] is None:
+        app_context["message_box"]("Cam is not connected")
         return win.destroy()
-    on_open(app_context)
-    
+    on_open()
