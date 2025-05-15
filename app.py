@@ -1,7 +1,7 @@
-from tkinter import Tk, Label, Button, W, messagebox, Frame, SE, NORMAL, DISABLED
+from tkinter import Tk, Label, Button, W, messagebox, NORMAL, DISABLED
 import tkinter as tk
 from settings import open_settings_window
-from context import app_context
+from models import app_context
 import camera_connector, event_handler
 from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice, GCInterface
@@ -33,11 +33,6 @@ def run_app():
     connection_label = Label(connection_info_row, text="Connection status: Disconnected")
     connection_label.grid(row=0, column=0)
 
-    camera_data = {
-        "system": None,
-        "cam": None
-    }
-
     def message_box(text):
         messagebox.showinfo("Message", text)
 
@@ -49,16 +44,13 @@ def run_app():
             case ConnectionState.CONNECTING:
                 status = "Connecting..."
             case ConnectionState.CONNECTED:
-                cam: GCDevice = camera_data["cam"]
+                cam: GCDevice = app_context["camera_data"]["cam"]
                 ip = cam._info.host_address
                 status = f"Connected to {ip}"
         connection_label.config(text=f"Connection status: {status}")
 
-    app_context.update({
-        "camera_data": camera_data,
-        "message_box": message_box,
-        "set_connection_state": set_connection_state
-    })
+    app_context["message_box"] = message_box
+    app_context["set_connection_state"] = set_connection_state
 
     Label(app_name_row, text="FX10 Configuration app", font=("", 22)).pack()
     connect_button = Button(connection_row, text="Connect FX10", command=camera_connector.connect)
@@ -78,7 +70,7 @@ def run_app():
     settings_button = Button(settings_row, text="Open settings", command=lambda: open_settings_window(window))
     settings_button.grid(row=9, column=0, sticky=W)
 
-    buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
+    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
 
     def cam_event(event: event_handler.Events, args: Tuple[GCDevice, GCInterface]):
         match event:
@@ -98,15 +90,15 @@ def run_app():
     def set_buttons(state):
         if state is NORMAL:
             connect_button.config(state=DISABLED)
-        for button in buttons:
+        for button in toggleable_buttons:
             button.config(state=state)
 
     event_handler.add_listener(cam_event)    
     set_buttons(DISABLED)
 
     def on_close():
-        if (camera_data["system"]):
-            system = camera_data["system"]
+        if (app_context["camera_data"]["system"]):
+            system = app_context["camera_data"]["system"]
             system.close()
         exit()
 

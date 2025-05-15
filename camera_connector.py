@@ -3,7 +3,7 @@ from lib.spectralcam.specim.fx10 import FX10
 from lib.spectralcam.exceptions import *
 import numpy as np
 import threading
-from context import app_context
+from models import app_context
 from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice, GCInterface
 from tkinter import Toplevel, Label, W
@@ -58,21 +58,3 @@ def show_info(master):
     dev: GCDevice = app_context["camera_data"]["cam"]
     info_label = Label(win, text=dev._info.get_app_info())
     info_label.grid(row=3, column=1, sticky=W)
-
-def close():
-    canClose = False
-    try:
-        cam = app_context["camera_data"].get("cam")
-        if cam:
-            cam.close()
-        canClose = True
-    except NotConnectedError:
-        # todo: debug, remove in final version
-        app_context["message_box"]("Cam was not connected")
-        canClose = True
-    except AckError:
-        app_context["message_box"]("Problem with an acknowledgement from the camera")
-    finally:
-        if (canClose == True):
-            print("can close")
-            # app_context["close_app"]()
