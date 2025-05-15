@@ -15,9 +15,9 @@ def connect():
     thread.start()
 
 def find_and_connect_camera():
+    app_context["set_connection_state"](ConnectionState.CONNECTING)
     system = app_context["camera_data"]["system"]
     system.discover(FX10)
-    app_context["set_connection_state"](ConnectionState.CONNECTING)
 
 def quick_init_camera():
     cam = app_context["camera_data"].get("cam")

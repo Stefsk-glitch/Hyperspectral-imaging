@@ -84,8 +84,10 @@ def run_app():
                 set_buttons(NORMAL)
             case event_handler.Events.MULTIPLE_CAMS:
                 app_context["message_box"]("Found multiple cams. This app does not support multiple cams yet")
+                set_connection_state(ConnectionState.DISCONNECTED)
             case event_handler.Events.NO_CAM:
                 app_context["message_box"]("No cams found")
+                set_connection_state(ConnectionState.DISCONNECTED)
 
     def set_buttons(state):
         if state is NORMAL:
