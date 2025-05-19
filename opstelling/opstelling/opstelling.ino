@@ -377,12 +377,14 @@ void handleSerial3() {
                 else {
                     Serial.println("Unknown command");
                 }
-
-                // Respond with ack
-                StaticJsonDocument<200> ackDoc;
-                ackDoc["uno_ack"] = cmd;
-                serializeJson(ackDoc, Serial3);
-                Serial3.println();
+                
+                if (strcmp(cmd, "information") != 0){
+                  // Respond with ack
+                  StaticJsonDocument<200> ackDoc;
+                  ackDoc["uno_ack"] = cmd;
+                  serializeJson(ackDoc, Serial3);
+                  Serial3.println();
+                }
             } else {
                 Serial.print("Mega JSON parse failed: ");
                 Serial.println(error.c_str());
