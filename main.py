@@ -64,6 +64,10 @@ async def handler(websocket):
                                 msg = "✅ Started scan"
                             elif mega_ack["uno_ack"] == "stop_scan":
                                 msg = "🛑 Stopped scan"
+                            elif "length" in mega_ack["uno_ack"]:
+                                msg = "Length set" 
+                            elif "speed" in mega_ack["uno_ack"]:
+                                msg = "Speed set" 
                         
                         elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys():
                             msg = (
