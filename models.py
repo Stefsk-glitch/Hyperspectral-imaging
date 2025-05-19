@@ -2,7 +2,7 @@ import queue
 
 camera_data = {
     "system": None,                 # GCSystem
-    "cam": None                     # GCDevice
+    "cam": None                     # FXBase
 }
 
 app_context = {

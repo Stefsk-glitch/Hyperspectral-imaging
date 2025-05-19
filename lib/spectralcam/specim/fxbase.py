@@ -209,8 +209,6 @@ class FXBase(DiscoverableGigeDevice):
     for feature in nodes:
       if is_feature(feature):
         features.append(feature)
-        if self.verbose or self.print_info:
-          print("{0}: {1}".format(i, feature.node.name))
         i += 1
     return features
 
