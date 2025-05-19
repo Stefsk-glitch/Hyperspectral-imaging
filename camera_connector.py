@@ -1,5 +1,6 @@
 from lib.spectralcam.gentl.gentl import GCSystem
 from lib.spectralcam.specim.fx10 import FX10
+from lib.spectralcam.specim import FXBase
 from lib.spectralcam.exceptions import *
 import numpy as np
 import threading
@@ -9,7 +10,7 @@ from lib.spectralcam.gentl import GCDevice
 from tkinter import Toplevel, Label, W
 
 def connect():
-    if app_context["camera_data"].get("system") is None:
+    if app_context["camera_data"]["system"] is None:
         app_context["camera_data"]["system"] = GCSystem()
 
     thread = threading.Thread(target=find_and_connect_camera)
@@ -21,7 +22,7 @@ def find_and_connect_camera():
     system.discover(FX10)
 
 def quick_init_camera():
-    cam = app_context["camera_data"].get("cam")
+    cam: FX10 = app_context["camera_data"]["cam"]
     if not cam:
         return app_context["message_box"]("No cam to quick init")
 
@@ -32,7 +33,7 @@ def quick_init_camera():
     cam.start_acquire(True)
 
 def extract_data():
-    cam = app_context["camera_data"].get("cam")
+    cam: FXBase = app_context["camera_data"]["cam"]
     if not cam:
         app_context["message_box"]("No cam to extract data from")
         return
@@ -43,13 +44,6 @@ def extract_data():
 def save_data(data):
     np.save("data.npy", data)
     app_context["message_box"]("Finished saving data")
-
-def get_categories():
-    cam = app_context["camera_data"].get("cam")
-    if not cam:
-        app_context["message_box"]("No cam to get categories")
-        return
-    cam.get_features()
 
 def show_info(master):
     win = Toplevel(master)
