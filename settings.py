@@ -1,5 +1,5 @@
-from tkinter import Toplevel, Label, W, Frame, Canvas, Scrollbar, ttk, StringVar, Entry
-from models import app_context, camera_data
+from tkinter import Toplevel, Frame, ttk, StringVar, Entry
+from models import camera_data
 from lib.spectralcam.specim import FXBase
 
 def open_settings_window(master):
