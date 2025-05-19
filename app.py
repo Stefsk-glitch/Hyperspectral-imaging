@@ -1,6 +1,6 @@
 import camera_connector, event_handler
 import logging
-from tkinter import Tk, Label, Button, W, messagebox, NORMAL, DISABLED
+from tkinter import Tk, Label, Button, Entry, W, messagebox, NORMAL, DISABLED
 import tkinter as tk
 from settings import open_settings_window
 from models import app_context, command_queue, esp32_status
@@ -55,7 +55,19 @@ def run_app():
     Button(opstelling_controls_row, text="Start scan", command=lambda: command_queue.put("start_scan")).grid(row=0, column=0)
     Button(opstelling_controls_row, text="Stop scan", command=lambda: command_queue.put("stop_scan")).grid(row=0, column=1, padx="5")
 
-    Button(main_frame, text="n").pack(anchor="w")
+    scan_length_row = tk.Frame(main_frame)
+    scan_length_row.pack(fill="x", pady=2)
+    Button(scan_length_row, text="Scan length", command=lambda: command_queue.put(f"length@{scan_length_entry.get()}")).grid(row=0, column=0, sticky="w")
+    scan_length_entry = Entry(scan_length_row)
+    scan_length_entry.grid(row=0, column=1, padx=5)
+
+    scan_speed_row = tk.Frame(main_frame)
+    scan_speed_row.pack(fill="x", pady=2)
+    Button(scan_speed_row, text="Scan speed", command=lambda: command_queue.put(f"speed@{scan_speed_entry.get()}")).grid(row=0, column=0, sticky="w")
+    scan_speed_entry = Entry(scan_speed_row)
+    scan_speed_entry.grid(row=0, column=1, padx=5)
+
+    Button(main_frame, text="Show setup information", command=lambda: command_queue.put("information")).pack(anchor="w")
 
     toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
 
