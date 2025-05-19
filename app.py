@@ -11,6 +11,7 @@ from models import app_context, camera_data
 
 def run_app():
     window = Tk()
+    app_context["window"] = window
     window.geometry("800x600")
     window.title("FX10 Configuration App")
 
@@ -59,12 +60,14 @@ def run_app():
     scan_length_row.pack(fill="x", pady=2)
     Button(scan_length_row, text="Scan length", command=lambda: command_queue.put(f"length@{scan_length_entry.get()}")).grid(row=0, column=0, sticky="w")
     scan_length_entry = Entry(scan_length_row)
+    scan_length_entry.insert(-1, "example: 0.5 (0 - 1)")
     scan_length_entry.grid(row=0, column=1, padx=5)
 
     scan_speed_row = tk.Frame(main_frame)
     scan_speed_row.pack(fill="x", pady=2)
     Button(scan_speed_row, text="Scan speed", command=lambda: command_queue.put(f"speed@{scan_speed_entry.get()}")).grid(row=0, column=0, sticky="w")
-    scan_speed_entry = Entry(scan_speed_row)
+    scan_speed_entry = Entry(scan_speed_row, width=26)
+    scan_speed_entry.insert(-1, "example: 0.050 (0.010 - 0.200)")
     scan_speed_entry.grid(row=0, column=1, padx=5)
 
     Button(main_frame, text="Show setup information", command=lambda: command_queue.put("information")).pack(anchor="w")

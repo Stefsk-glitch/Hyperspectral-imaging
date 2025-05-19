@@ -5,7 +5,7 @@ import threading
 import sys
 import logging
 from app import run_app
-from models import command_queue
+from models import command_queue, app_context
 from queue import Empty
 from models import command_queue, esp32_status
 from pathlib import Path
@@ -48,6 +48,33 @@ async def handler(websocket):
 
                 mega_ack = await websocket.recv()
                 print(f"< Mega Ack: {mega_ack}")
+                
+                try:
+                    mega_ack = json.loads(mega_ack)
+                except json.JSONDecodeError:
+                    def show_fallback():
+                        app_context["message_box"](f"Mega Ack (raw): {mega_ack}")
+                    app_context["window"].after(0, show_fallback)
+                else:
+                    def show_mega_ack():
+                        msg = ""
+                        print(mega_ack)
+                        if "uno_ack" in mega_ack:
+                            if mega_ack["uno_ack"] == "start_scan":
+                                msg = "✅ Started scan"
+                            elif mega_ack["uno_ack"] == "stop_scan":
+                                msg = "🛑 Stopped scan"
+                        
+                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys():
+                            msg = (
+                                f"🌡️ Temperature 1: {mega_ack['t1']} °C\n"
+                                f"🌡️ Temperature 2: {mega_ack['t2']} °C\n"
+                                f"📶 Status: {mega_ack['status']}\n"
+                                f"📏 Length: {mega_ack['length']}\n"
+                                f"🚀 Speed: {mega_ack['speed']}"
+                            )
+                        app_context["message_box"](msg)
+                    app_context["window"].after(0, show_mega_ack)
 
             await asyncio.sleep(0.1)
     except websockets.ConnectionClosed:
