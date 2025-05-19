@@ -18,6 +18,7 @@ from ...spectralcam.utils import ETH_MAX_MTU, netmask_to_short, ip_to_uint32, is
 from ...spectralcam.gige import GVCP_PORT, GVCPRequestId, GVCPAck, GVCPDiscoveryAck, GVCPDiscoveryCmd, GVCPForceIPCmd
 from ...spectralcam.exceptions import AckError
 from ...spectralcam.preview import PreviewFactory
+from event_handler import fire_event, Events
 
 # GenICam transport layer type codes
 TLTYPE_GIGE = "GEV"
@@ -49,6 +50,14 @@ class GCDeviceInfo:
     result += f"  Host address:               {self.host_address}/{netmask_to_short(self.host_netmask)}\n"
     result += "Device:\n"
     result += "\n".join(list(map(lambda row: (f"  {row}"), str(self.device).split("\n"))))
+    return result
+  
+  def get_app_info(self) -> str:
+    result = "Info:\n"
+    result += f"Mac Address: {self.device.mac_address}\n"
+    result += f"Manufacturer: {self.device.manufacturer_name}\n"
+    result += f"Device Model: {self.device.model_name}\n"
+    result += f"Serial Number: {self.device.serial_number}\n"
     return result
 
   def get(self, cmd: int) -> Union[str, int]:
@@ -123,9 +132,9 @@ class GCInterfaceInfo:
     self.addrs = addrs
 
   def __str__(self) -> str:
-    result = f"GCInterfaceInfo: interface {self.name}"
+    result = f"Interface: {self.name}"
     for addr in self.addrs:
-      result += f"\n  {addr.family.name} {addr.address}/{netmask_to_short(addr.netmask)}"
+      result += f"\n IP info: {addr.family.name} {addr.address}/{netmask_to_short(addr.netmask)}"
     return result
 
   def get(self, cmd: int) -> str:
@@ -573,16 +582,22 @@ class GCSystem:
 
     # No devices was found
     if len(dev_list) == 0:
+      fire_event(Events.NO_CAM, None)
       return None, None
 
     # Found 1 matching device - open automatically
     elif not all and len(dev_list) == 1:
       dev_id, inf = dev_list[0]
+      dev_info = inf.get_device_info(dev_id)
       open_device = inf.open_device(dev_id, device_type, GVCP_PORT, self.preview_factory)
       open_interface = inf
+      if open_device.is_open:
+        print(f"Connected to {dev_info.device.mac_address}")
+        fire_event(Events.CAM_FOUND, (open_device, open_interface))
 
     # Found more than 1 device
     else:
+      fire_event(Events.MULTIPLE_CAMS, None)
       return None, None
 
     # Close unnecessary interfaces

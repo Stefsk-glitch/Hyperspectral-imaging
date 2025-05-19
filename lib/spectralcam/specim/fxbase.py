@@ -143,8 +143,8 @@ class FXBase(DiscoverableGigeDevice):
       self.gvcp.disconnect()
     if self.preview != None:
       self.preview.hide()
-    if self._verbose:
-      print("FX: Device closed")
+    print("FX: Device closed")
+    return True
 
   def get_node(self, name: Union[str, int]) -> Union[IValue, None]:
     """
@@ -209,8 +209,6 @@ class FXBase(DiscoverableGigeDevice):
     for feature in nodes:
       if is_feature(feature):
         features.append(feature)
-        if self.verbose or self.print_info:
-          print("{0}: {1}".format(i, feature.node.name))
         i += 1
     return features
 
