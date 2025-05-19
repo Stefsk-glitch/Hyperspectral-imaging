@@ -8,6 +8,7 @@ from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice, GCInterface, GCSystem
 from typing import Tuple
 from models import app_context, camera_data
+import time
 
 def run_app():
     window = Tk()
@@ -132,6 +133,8 @@ def run_app():
     set_buttons(DISABLED)
 
     def on_close():
+        command_queue.put("stop_scan")
+        time.sleep(0.5)
         if (app_context["camera_data"]["system"]):
             system: GCSystem = app_context["camera_data"]["system"]
             system.close()
