@@ -9,6 +9,7 @@ from lib.spectralcam.gentl import GCDevice, GCInterface, GCSystem
 from typing import Tuple
 from models import app_context, camera_data
 import time
+import pca
 
 def run_app():
     window = Tk()
@@ -43,7 +44,9 @@ def run_app():
     settings_row = tk.Frame(main_frame)
     settings_row.pack(fill="x", pady=2)
     settings_button = Button(settings_row, text="Open settings", command=lambda: open_settings_window(window))
-    settings_button.grid(row=9, column=0, sticky=W)
+    settings_button.grid(row=0, column=0, sticky=W)
+    pca_button = Button(settings_row, text="Open PCA app", command=lambda: pca.main())
+    pca_button.grid(row=0, column=1, sticky=W)
 
     Label(main_frame, text="Opstelling", font=("", 20)).pack(anchor="w")
 
