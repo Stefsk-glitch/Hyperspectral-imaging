@@ -143,7 +143,6 @@ void setup() {
 }
 
 void loop() {
-
     handleSerial3();
 
     if (currentState != Waiting) {
@@ -322,11 +321,12 @@ void handleSerial3() {
                 Serial.print("Mega Command received: ");
                 Serial.println(cmd);
 
+                // handle commands
                 if (strcmp(cmd, "start_scan") == 0) {
                   StartButton = true;
                 }
 
-                if (strcmp(cmd, "stop_scan") == 0) {
+                else if (strcmp(cmd, "stop_scan") == 0) {
                   currentState = SafeStop;
                   motor.stop();
                   FirstInteruptStopButton = true;
@@ -335,6 +335,47 @@ void handleSerial3() {
                   currentState = Waiting; 
                   StringCurrentState = stateToString(currentState);
                   display.mainMenu();
+                }
+
+                else if (strncmp(cmd, "length@", 7) == 0) {
+                    float newLength = atof(cmd + 7);
+                    if (newLength < 1 && newLength > 0) {
+                      scanLength = newLength;
+                      Serial.print("Set length to: ");
+                      Serial.println(scanLength, 4); 
+                    }
+                    else{
+                      Serial.println("Error");  
+                    }
+                } 
+
+                else if (strncmp(cmd, "speed@", 6) == 0) {
+                    float newSpeed = atof(cmd + 6);
+                    if (newSpeed > 0.009 && newSpeed < 0.201){
+                      scanSpeed = newSpeed;
+                      Serial.print("Set speed to: ");
+                      Serial.println(scanSpeed, 4);  
+                    }
+                    else{
+                      Serial.println("Error");  
+                    }   
+                }
+
+                else if (strcmp(cmd, "information") == 0) {
+                    // Create and send full status JSON
+                    StaticJsonDocument<256> infoDoc;
+                    infoDoc["t1"] = temp1;
+                    infoDoc["t2"] = temp2;
+                    infoDoc["status"] = StringCurrentState;
+                    infoDoc["length"] = scanLength;
+                    infoDoc["speed"] = scanSpeed;
+
+                    serializeJson(infoDoc, Serial3);
+                    Serial3.println();
+                } 
+
+                else {
+                    Serial.println("Unknown command");
                 }
 
                 // Respond with ack
