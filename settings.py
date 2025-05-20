@@ -11,7 +11,6 @@ def open_settings_window(master):
         if len(values) == 2:
             set_value_window(values[0], values[1])
 
-
     win = Toplevel(master)
     win.title("Settings")
     win.geometry("800x600")
@@ -32,15 +31,20 @@ def open_settings_window(master):
     tree.tag_bind("click", "<<TreeviewSelect>>", item_selected)
     scrollbar.pack(side="right", fill="y")
 
-    cam: FXBase = camera_data["cam"]
-    features = cam.get_features()
     all_rows = []
-    for feature in sorted(features, key=lambda f: str(f.node.name).lower()):
-        try:
-            value = cam.get(feature)
-        except Exception:
-            value = "N/A"
-        all_rows.append((str(feature.node.name), str(value)))
+    cam: FXBase = camera_data["cam"]
+
+    def load_settings():
+        all_rows.clear()
+        features = cam.get_features()
+        for feature in sorted(features, key=lambda f: str(f.node.name).lower()):
+            try:
+                value = cam.get(feature)
+            except Exception:
+                value = "N/A"
+            all_rows.append((str(feature.node.name), str(value)))
+        search_var.set("")
+        update_treeview(all_rows)
 
     def update_treeview(rows):
         for item in tree.get_children():
@@ -66,6 +70,7 @@ def open_settings_window(master):
         try:
             cam.set(setting, value)
             window.destroy()
+            load_settings()
         except Exception as error:
             app_context["message_box"](error)
 
@@ -79,4 +84,5 @@ def open_settings_window(master):
         entry.pack()
         Button(win, text="Save", command=lambda:confirm_set_value(setting, entry_var.get(), win)).pack()
 
-    update_treeview(all_rows)
+    load_settings()
+    
