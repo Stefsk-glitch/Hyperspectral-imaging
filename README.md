@@ -39,3 +39,80 @@ The app may not find any camera's. Set network settings to local link only for e
 - Internet settings should look something like this:
 ![alt text](readme_attributes/image.png)
 ![alt text](readme_attributes/image-1.png)
+
+# Diagram
+```mermaid
+classDiagram
+
+class main {
+    +main()
+}
+
+class enums {
+    +Events
+    +ConnectionState
+}
+
+class event-handler {
+    +add_listener()
+    +remove_listener()
+    +fire_event()
+
+    -List listeners
+}
+
+class models {
+    +camera_data
+    +app_context
+    +command_queue
+    +esp32_status
+}
+
+class pca {
+    +not_implemented_yet()
+}
+
+class settings {
+    +open_settings_window()
+    -update_treeview()
+    -on_search()
+    -confirm_set_value()
+    -set_value_window()
+}
+
+class app {
+    +run_app()
+    +message_box()
+    +set_connection_status()
+    -camera_data
+    -Tkinter GUI
+    -WebSocketServer server
+}
+
+class WebSocketServer {
+    +start()
+    +onClientConnect()
+    +onMessage()
+    +sendToWemos()
+}
+
+class camera_connector {
+    +connect()
+    +find_and_connect_camera()
+    +quick_init_camera()
+    +extract_data()
+    +save_data()
+    +show_info()
+}
+
+class spectralcam_library {
+    +external
+}
+
+main --> app
+main --> WebSocketServer : hosts
+app --> camera_connector
+camera_connector --|> spectralcam_library
+app --> settings
+app --> pca
+```
