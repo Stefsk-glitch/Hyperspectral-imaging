@@ -17,7 +17,7 @@ def start_pca_app():
 def run_app():
     window = Tk()
     app_context["window"] = window
-    window.geometry("600x600")
+    window.geometry("500x500")
     window.title("FX10 Configuration App")
 
     main_frame = tk.Frame(window)
