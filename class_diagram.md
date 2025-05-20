@@ -63,15 +63,13 @@ class camera_connector {
 }
 
 class spectralcam_library {
-    +set_defaults()
-    +open_stream()
-    +start_acquire()
-    +stop_acquire()
-    +close_stream()
+    +external
 }
 
 main --> app
-app --> WebSocketServer : hosts
-app --> FX10Connector
-camera_connector --> spectralcam_library
+main --> WebSocketServer : hosts
+app --> camera_connector
+camera_connector --|> spectralcam_library
+app --> settings
+app --> pca
 ```
