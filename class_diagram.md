@@ -6,25 +6,35 @@ class main {
 }
 
 class enums {
-    class Enums {
-        
-    }
+    +Events
+    +ConnectionState
 }
 
 class event-handler {
+    +add_listener()
+    +remove_listener()
+    +fire_event()
 
+    -List listeners
 }
 
 class models {
-
+    +camera_data
+    +app_context
+    +command_queue
+    +esp32_status
 }
 
 class pca {
-
+    +not_implemented_yet()
 }
 
 class settings {
-
+    +open_settings_window()
+    -update_treeview()
+    -on_search()
+    -confirm_set_value()
+    -set_value_window()
 }
 
 class app {
@@ -43,17 +53,16 @@ class WebSocketServer {
     +sendToWemos()
 }
 
-class FX10Connector {
+class camera_connector {
     +connect()
+    +find_and_connect_camera()
     +quick_init_camera()
-    +stop_data()
+    +extract_data()
     +save_data()
-    +get_settings()
-    +get_info()
-    +close()
+    +show_info()
 }
 
-class FX10 {
+class spectralcam_library {
     +set_defaults()
     +open_stream()
     +start_acquire()
@@ -64,5 +73,5 @@ class FX10 {
 main --> app
 app --> WebSocketServer : hosts
 app --> FX10Connector
-FX10Connector --> FX10
+camera_connector --> spectralcam_library
 ```
