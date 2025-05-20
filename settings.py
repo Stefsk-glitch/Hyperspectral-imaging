@@ -1,6 +1,7 @@
 from tkinter import Toplevel, Frame, ttk, StringVar, Entry, Label, Button
 from models import camera_data, app_context
 from lib.spectralcam.specim import FXBase
+from genicam.genapi import AccessException
 
 def open_settings_window(master):
     def item_selected(event):
@@ -71,6 +72,8 @@ def open_settings_window(master):
             cam.set(setting, value)
             window.destroy()
             load_settings()
+        except AccessException as error:
+            app_context["message_box"]("This value is not changeable")
         except Exception as error:
             app_context["message_box"](error)
 
