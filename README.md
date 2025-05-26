@@ -53,7 +53,7 @@ class enums {
     +ConnectionState
 }
 
-class event-handler {
+class event_handler {
     +add_listener()
     +remove_listener()
     +fire_event()
@@ -68,7 +68,7 @@ class models {
     +esp32_status
 }
 
-class pca {
+class pca_app {
     +not_implemented_yet()
 }
 
@@ -114,5 +114,11 @@ main --> WebSocketServer : hosts
 app --> camera_connector
 camera_connector --|> spectralcam_library
 app --> settings
-app --> pca
+app --> pca_app
+
+camera_connector ..> models
+camera_connector ..> enums
+settings ..> models
+spectralcam_library ..> event_handler
+app ..> event_handler
 ```
