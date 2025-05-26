@@ -37,7 +37,7 @@ def run_app():
 
     cam_actions_row = tk.Frame(main_frame)
     cam_actions_row.pack(fill="x", pady=2)
-    quick_init_button = Button(cam_actions_row, text="Open Preview", command=camera_connector.quick_init_camera)
+    quick_init_button = Button(cam_actions_row, text="Quick Init", command=camera_connector.quick_init_camera)
     quick_init_button.grid(row=0, column=0)
     extract_data_button = Button(cam_actions_row, text="Extract Data", command=camera_connector.extract_data)
     extract_data_button.grid(row=0, column=1, padx="5")
