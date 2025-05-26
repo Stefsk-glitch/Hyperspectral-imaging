@@ -122,3 +122,7 @@ settings ..> models
 spectralcam_library ..> event_handler
 app ..> event_handler
 ```
+
+## installing detectron 2
+git clone https://github.com/facebookresearch/detectron2.git
+python -m pip install -e detectron2
