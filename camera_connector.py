@@ -27,7 +27,6 @@ def quick_init_camera():
         return app_context["message_box"]("No cam to quick init")
 
     cam.set_defaults(frame_rate=30.0, exposure_time=30000.0)
-    cam.set("BinningHorizontal", 2)
     cam.open_stream()
     cam.show_preview()
     cam.start_acquire(True)
