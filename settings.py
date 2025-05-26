@@ -80,8 +80,8 @@ def open_settings_window(master):
     def set_value_window(setting, value):
         win = Toplevel(master)
         win.title("Set Value")
-        Label(win, text=setting).pack()
-        Label(win, text=value).pack()
+        Label(win, text=cam.info(setting), anchor="w", justify="left").pack(fill="x")
+        Label(win, text=f"Current value: {value}", anchor="w", justify="left").pack(fill="x")
         entry_var = StringVar()
         entry = Entry(win, textvariable=entry_var)
         entry.pack()
