@@ -51,3 +51,12 @@ def show_info(master):
     dev: GCDevice = app_context["camera_data"]["cam"]
     info_label = Label(win, text=dev._info.get_app_info())
     info_label.grid(row=3, column=1, sticky=W)
+
+def open_preview():
+    cam: FX10 = app_context["camera_data"]["cam"]
+    if not cam:
+        return app_context["message_box"]("No cam to quick init")
+    
+    cam.open_stream()
+    cam.show_preview()
+    cam.start_acquire(True)

@@ -41,6 +41,8 @@ def run_app():
     quick_init_button.grid(row=0, column=0)
     extract_data_button = Button(cam_actions_row, text="Extract Data", command=camera_connector.extract_data)
     extract_data_button.grid(row=0, column=1, padx="5")
+    open_preview_button = Button(cam_actions_row, text="Open Preview", command=camera_connector.open_preview)
+    open_preview_button.grid(row=0, column=2, padx="5")
 
     settings_row = tk.Frame(main_frame)
     settings_row.pack(fill="x", pady=2)
@@ -76,7 +78,7 @@ def run_app():
 
     Button(main_frame, text="Show setup information", command=lambda: command_queue.put("information")).pack(anchor="w")
 
-    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
+    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button, open_preview_button]
 
     def message_box(text):
         messagebox.showinfo("Message", text)
