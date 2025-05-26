@@ -14,6 +14,9 @@ import subprocess
 def start_pca_app():
     subprocess.Popen(['python', 'pca.py'])
 
+def start_trainer():
+    subprocess.Popen(['python', 'trainer.py'])
+
 def run_app():
     window = Tk()
     app_context["window"] = window
@@ -47,6 +50,7 @@ def run_app():
     settings_button = Button(settings_row, text="Open Settings", command=lambda: open_settings_window(window))
     settings_button.grid(row=0, column=0, sticky=W)
     Button(main_frame, text="Open PCA app", command=start_pca_app).pack(anchor="w", pady=2)
+    Button(main_frame, text="Open Trainer app", command=start_trainer).pack(anchor="w", pady=2)
 
     Label(main_frame, text="Opstelling", font=("", 20)).pack(anchor="w")
 
