@@ -12,3 +12,6 @@ vispy==0.14.3
 websockets
 matplotlib
 scikit-learn
+opencv-python 
+torch
+torchvision

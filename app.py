@@ -14,16 +14,19 @@ import subprocess
 def start_pca_app():
     subprocess.Popen(['python', 'pca.py'])
 
+def start_trainer():
+    subprocess.Popen(['python', 'trainer.py'])
+
 def run_app():
     window = Tk()
     app_context["window"] = window
-    window.geometry("800x600")
+    window.geometry("500x500")
     window.title("FX10 Configuration App")
 
     main_frame = tk.Frame(window)
     main_frame.pack(padx=10, pady=10, anchor="w")
 
-    Label(main_frame, text="FX10 Configuration app", font=("", 22)).pack()
+    Label(main_frame, text="FX10", font=("", 22)).pack(anchor="w")
 
     connection_row = tk.Frame(main_frame)
     connection_row.pack(fill="x", pady=2)
@@ -42,14 +45,12 @@ def run_app():
     extract_data_button = Button(cam_actions_row, text="Extract Data", command=camera_connector.extract_data)
     extract_data_button.grid(row=0, column=1, padx="5")
 
-    Label(main_frame, text="Settings", font=("", 20)).pack(anchor="w")
-
     settings_row = tk.Frame(main_frame)
     settings_row.pack(fill="x", pady=2)
-    settings_button = Button(settings_row, text="Open settings", command=lambda: open_settings_window(window))
+    settings_button = Button(settings_row, text="Open Settings", command=lambda: open_settings_window(window))
     settings_button.grid(row=0, column=0, sticky=W)
-    pca_button = Button(settings_row, text="Open PCA app", command=start_pca_app)
-    pca_button.grid(row=0, column=1, sticky=W)
+    Button(main_frame, text="Open PCA app", command=start_pca_app).pack(anchor="w", pady=2)
+    Button(main_frame, text="Open Trainer app", command=start_trainer).pack(anchor="w", pady=2)
 
     Label(main_frame, text="Opstelling", font=("", 20)).pack(anchor="w")
 

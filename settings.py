@@ -1,8 +1,17 @@
-from tkinter import Toplevel, Frame, ttk, StringVar, Entry
-from models import camera_data
+from tkinter import Toplevel, Frame, ttk, StringVar, Entry, Label, Button
+from models import camera_data, app_context
 from lib.spectralcam.specim import FXBase
+from genicam.genapi import AccessException
 
 def open_settings_window(master):
+    def item_selected(event):
+        selected_item = tree.focus()
+        if not selected_item:
+            return
+        values = tree.item(selected_item, 'values')
+        if len(values) == 2:
+            set_value_window(values[0], values[1])
+
     win = Toplevel(master)
     win.title("Settings")
     win.geometry("800x600")
@@ -20,23 +29,29 @@ def open_settings_window(master):
     tree.pack(side="left", fill="both", expand=True)
     scrollbar = ttk.Scrollbar(container, orient="vertical", command=tree.yview)
     tree.configure(yscrollcommand=scrollbar.set)
+    tree.tag_bind("click", "<<TreeviewSelect>>", item_selected)
     scrollbar.pack(side="right", fill="y")
 
-    cam: FXBase = camera_data["cam"]
-    features = cam.get_features()
     all_rows = []
-    for feature in sorted(features, key=lambda f: str(f.node.name).lower()):
-        try:
-            value = cam.get(feature)
-        except Exception:
-            value = "N/A"
-        all_rows.append((str(feature.node.name), str(value)))
+    cam: FXBase = camera_data["cam"]
+
+    def load_settings():
+        all_rows.clear()
+        features = cam.get_features()
+        for feature in sorted(features, key=lambda f: str(f.node.name).lower()):
+            try:
+                value = cam.get(feature)
+            except Exception:
+                value = "N/A"
+            all_rows.append((str(feature.node.name), str(value)))
+        search_var.set("")
+        update_treeview(all_rows)
 
     def update_treeview(rows):
         for item in tree.get_children():
             tree.delete(item)
         for setting, value in rows:
-            tree.insert("", "end", values=(setting, value))
+            tree.insert("", "end", values=(setting, value), tags="click")
 
     def on_search(*args):
         query = search_var.get().lower()
@@ -52,4 +67,25 @@ def open_settings_window(master):
 
     search_var.trace_add("write", on_search)
 
-    update_treeview(all_rows)
+    def confirm_set_value(setting, value, window):
+        try:
+            cam.set(setting, value)
+            window.destroy()
+            load_settings()
+        except AccessException as error:
+            app_context["message_box"]("This value is not changeable")
+        except Exception as error:
+            app_context["message_box"](error)
+
+    def set_value_window(setting, value):
+        win = Toplevel(master)
+        win.title("Set Value")
+        Label(win, text=cam.info(setting), anchor="w", justify="left").pack(fill="x")
+        Label(win, text=f"Current value: {value}", anchor="w", justify="left").pack(fill="x")
+        entry_var = StringVar()
+        entry = Entry(win, textvariable=entry_var)
+        entry.pack()
+        Button(win, text="Save", command=lambda:confirm_set_value(setting, entry_var.get(), win)).pack()
+
+    load_settings()
+    
