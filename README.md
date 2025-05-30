@@ -124,5 +124,5 @@ app ..> event_handler
 ```
 
 ## installing detectron 2
-git clone https://github.com/facebookresearch/detectron2.git
+git clone https://github.com/facebookresearch/detectron2.git </br>
 python -m pip install -e detectron2
