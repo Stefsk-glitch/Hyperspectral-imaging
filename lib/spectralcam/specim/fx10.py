@@ -9,7 +9,7 @@ class FX10(FXBase):
   DEV_INFO_VENDOR = "Specim"
   DEV_INFO_MODEL = "FX10e"
 
-  def set_defaults(self) -> None:
+  def set_defaults(self, frame_rate: float = 30.0, exposure_time: float = 20000.0) -> None:
     """
     Set default parameters to the camera.
 
@@ -44,6 +44,8 @@ class FX10(FXBase):
       self.set("EnAcquisitionFrameRate", True)
 
     self.set("GevSCPD", 10000) # Packet send delay in 10 nano seconds
+    self.set("ExposureTime", exposure_time)
+    self.set("AcquisitionFrameRate", frame_rate)
 
     acquisition_mode = self.get("AcquisitionMode")
     if acquisition_mode != "Continuous":
@@ -58,3 +60,4 @@ if __name__ == "__main__":
   # Find connected FX10 camera automatically (more or less)
   system = GCSystem()
   fx10, intf = system.discover(FX10)
+
