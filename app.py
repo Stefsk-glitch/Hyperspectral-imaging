@@ -10,6 +10,7 @@ from typing import Tuple
 from models import app_context, camera_data
 import time
 import subprocess
+from calibration import open_calibration_window
 
 def start_pca_app():
     subprocess.Popen(['python', 'pca.py'])
@@ -34,6 +35,8 @@ def run_app():
     connect_button.grid(row=0, column=0)
     cam_information_button = Button(connection_row, text="Camera Info", command=lambda:camera_connector.show_info(window))
     cam_information_button.grid(row=0, column=1, padx="5")
+    calibrate_cam_button = Button(connection_row, text="Calibrate Camera", command=lambda:open_calibration_window(window))
+    calibrate_cam_button.grid(row=0, column=2, padx="5")
 
     cam_connection_label = Label(main_frame, text="Connection status: Disconnected")
     cam_connection_label.pack(anchor="w")
