@@ -13,3 +13,5 @@ app_context = {
 
 command_queue = queue.Queue()
 esp32_status = {"connected": False}
+stopped = {"stop": False}
+pipeline = {"visualize": False}
