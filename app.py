@@ -1,9 +1,9 @@
 import camera_connector, event_handler
 import logging
-from tkinter import Tk, Label, Button, Entry, W, messagebox, NORMAL, DISABLED
+from tkinter import Tk, Label, Button, Entry, W, messagebox, NORMAL, DISABLED, Checkbutton, Spinbox
 import tkinter as tk
 from settings import open_settings_window
-from models import app_context, command_queue, esp32_status
+from models import app_context, command_queue, esp32_status, stopped, pipeline
 from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice, GCInterface, GCSystem
 from typing import Tuple
@@ -11,6 +11,8 @@ from models import app_context, camera_data
 import time
 import subprocess
 from calibration import open_calibration_window
+import threading
+from time import sleep
 
 def start_pca_app():
     subprocess.Popen(['python', 'pca.py'])
@@ -62,10 +64,17 @@ def run_app():
     connection_esp32_label = Label(esp32_info_row, text="ESP32 status: Disconnected")
     connection_esp32_label.grid(row=0, column=0)
 
+    checkbox_var = tk.IntVar()
+
     opstelling_controls_row = tk.Frame(main_frame)
     opstelling_controls_row.pack(fill="x", pady=2)
-    Button(opstelling_controls_row, text="Start scan", command=lambda: command_queue.put("start_scan")).grid(row=0, column=0)
+    Button(opstelling_controls_row, text="Start scan", command=lambda: start_scan(checkbox_var)).grid(row=0, column=0)
     Button(opstelling_controls_row, text="Stop scan", command=lambda: command_queue.put("stop_scan")).grid(row=0, column=1, padx="5")
+    Checkbutton(opstelling_controls_row, text="Visualize", variable=checkbox_var, 
+                             onvalue=1, offvalue=0,).grid(row=0, column=2, padx="5")
+    Label(opstelling_controls_row, text="Aantal scans: ").grid(row=0, column=3, padx="5")
+    spinbox_aantal_scans = Spinbox(opstelling_controls_row, from_=0, to=100, width=5, repeatdelay=500, repeatinterval=100)
+    spinbox_aantal_scans.grid(row=0, column=4, padx="5")
 
     scan_length_row = tk.Frame(main_frame)
     scan_length_row.pack(fill="x", pady=2)
@@ -87,6 +96,46 @@ def run_app():
 
     def message_box(text):
         messagebox.showinfo("Message", text)
+
+    def check_status():
+        i = 1
+        aantal_scans = int(spinbox_aantal_scans.get())
+
+        while True:
+            command_queue.put("information")
+            sleep(2) # 2 seconds
+
+            if stopped["stop"] == True:
+                stopped["stop"] = False
+
+                # TODO: visualize predictions
+
+                if(aantal_scans <= 0):
+                    break
+                else:
+                    if(aantal_scans == i):
+                        break
+                    else:
+                        i = i + 1
+                        command_queue.put("start_scan")
+
+
+    def start_scan(visualize):
+        if visualize.get() == 1:
+            pipeline["visualize"] = True
+        else:
+            pipeline["visualize"] = False
+              
+        if (int(spinbox_aantal_scans.get()) > 0):
+            pipeline["visualize"] = True
+        else:
+            pipeline["visualize"] = False
+            
+        command_queue.put("start_scan")
+        
+        if (visualize.get() == 1 or int(spinbox_aantal_scans.get()) > 0):
+            thread = threading.Thread(target=check_status)
+            thread.start()
 
     def set_connection_state(connected: ConnectionState):
         status = ""
