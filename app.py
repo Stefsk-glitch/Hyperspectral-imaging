@@ -92,7 +92,7 @@ def run_app():
 
     Button(main_frame, text="Show setup information", command=lambda: command_queue.put("information")).pack(anchor="w")
 
-    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button]
+    toggleable_buttons = [quick_init_button, extract_data_button, settings_button, cam_information_button, calibrate_cam_button]
 
     def message_box(text):
         messagebox.showinfo("Message", text)
