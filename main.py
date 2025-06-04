@@ -5,7 +5,7 @@ import threading
 import sys
 import logging
 from app import run_app
-from models import command_queue, app_context, esp32_status, pipeline, stopped, cam_was_scanning, camera_data
+from models import command_queue, app_context, esp32_status, pipeline, stopped, cam_was_scanning, camera_data, last_status
 from queue import Empty
 from pathlib import Path
 from time import sleep
@@ -70,27 +70,37 @@ async def handler(websocket):
                             elif "speed" in mega_ack["uno_ack"]:
                                 msg = "Speed set" 
                         
-                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys() and pipeline["visualize"] == False:
-                            msg = (
+                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys():
+                            current_status = mega_ack['status']
+                            previous_status = last_status.get("value")
+
+                            if previous_status == "Homimg" and current_status == "Accelerating":
+                                print("time to get white ref")
+
+                            last_status["value"] = current_status
+
+                            if pipeline["visualize"] == True:
+                                if (mega_ack['status']) == "Waiting":
+                                    stopped["stop"] = True
+                                if (camera_data["system"] or camera_data["cam"] is not None):
+                                    if (mega_ack['status']) == "Scanning":
+                                        if (cam_was_scanning["cam_was_scanning"] == False):
+                                            cam_was_scanning["cam_was_scanning"] = True
+                                            camera_connector.quick_init_camera()
+                                    else:
+                                        if (cam_was_scanning["cam_was_scanning"] == True):
+                                            cam_was_scanning["cam_was_scanning"] = False
+                                            camera_connector.extract_data()
+                            
+                            if pipeline["visualize"] == False:
+                                msg = (
                                 f"🌡️ Temperature 1: {mega_ack['t1']} °C\n"
                                 f"🌡️ Temperature 2: {mega_ack['t2']} °C\n"
                                 f"📶 Status: {mega_ack['status']}\n"
                                 f"📏 Length: {mega_ack['length']}\n"
                                 f"🚀 Speed: {mega_ack['speed']}"
                             )
-                        
-                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys() and pipeline["visualize"] == True:
-                            if (mega_ack['status']) == "Waiting":
-                                stopped["stop"] = True
-                            if (camera_data["system"] or camera_data["cam"] is not None):
-                                if (mega_ack['status']) == "Scanning":
-                                    if (cam_was_scanning["cam_was_scanning"] == False):
-                                        cam_was_scanning["cam_was_scanning"] = True
-                                        camera_connector.quick_init_camera()
-                                else:
-                                    if (cam_was_scanning["cam_was_scanning"] == True):
-                                        cam_was_scanning["cam_was_scanning"] = False
-                                        camera_connector.extract_data()
+
                         if msg:
                             app_context["message_box"](msg)
                     app_context["window"].after(0, show_mega_ack)
