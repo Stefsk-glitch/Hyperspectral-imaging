@@ -73,7 +73,7 @@ def run_app():
     Checkbutton(opstelling_controls_row, text="Visualize", variable=checkbox_var, 
                              onvalue=1, offvalue=0,).grid(row=0, column=2, padx="5")
     Label(opstelling_controls_row, text="Aantal scans: ").grid(row=0, column=3, padx="5")
-    spinbox_aantal_scans = Spinbox(opstelling_controls_row, from_=0, to=100, width=5, repeatdelay=500, repeatinterval=100)
+    spinbox_aantal_scans = Spinbox(opstelling_controls_row, from_=1, to=100, width=5, repeatdelay=500, repeatinterval=100)
     spinbox_aantal_scans.grid(row=0, column=4, padx="5")
 
     scan_length_row = tk.Frame(main_frame)
@@ -134,10 +134,9 @@ def run_app():
             pipeline["visualize"] = False
             
         command_queue.put("start_scan")
-        
-        if (visualize.get() == 1 or int(spinbox_aantal_scans.get()) > 0):
-            thread = threading.Thread(target=check_status)
-            thread.start()
+    
+        thread = threading.Thread(target=check_status)
+        thread.start()
 
     def set_connection_state(connected: ConnectionState):
         status = ""
