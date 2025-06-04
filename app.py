@@ -20,10 +20,13 @@ def start_pca_app():
 def start_trainer():
     subprocess.Popen(['python', 'trainer.py'])
 
+def start_scan_editor():
+    subprocess.Popen(['python', 'scan_editor.py'])
+
 def run_app():
     window = Tk()
     app_context["window"] = window
-    window.geometry("500x500")
+    window.geometry("500x550")
     window.title("FX10 Configuration App")
 
     main_frame = tk.Frame(window)
@@ -56,6 +59,7 @@ def run_app():
     settings_button.grid(row=0, column=0, sticky=W)
     Button(main_frame, text="Open PCA app", command=start_pca_app).pack(anchor="w", pady=2)
     Button(main_frame, text="Open Trainer app", command=start_trainer).pack(anchor="w", pady=2)
+    Button(main_frame, text="Open scan editor", command=start_scan_editor).pack(anchor="w", pady=2)
 
     Label(main_frame, text="Opstelling", font=("", 20)).pack(anchor="w")
 
