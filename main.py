@@ -5,7 +5,7 @@ import threading
 import sys
 import logging
 from app import run_app
-from models import command_queue, app_context, esp32_status, pipeline, stopped
+from models import command_queue, app_context, esp32_status, pipeline, stopped, cam_was_scanning, camera_data
 from queue import Empty
 from pathlib import Path
 from time import sleep
@@ -82,10 +82,15 @@ async def handler(websocket):
                         elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys() and pipeline["visualize"] == True:
                             if (mega_ack['status']) == "Waiting":
                                 stopped["stop"] = True
-                            if (mega_ack['status']) == "Scanning":
-                                camera_connector.quick_init_camera()
-                            else:
-                                camera_connector.extract_data()
+                            if (camera_data["system"] or camera_data["cam"] is not None):
+                                if (mega_ack['status']) == "Scanning":
+                                    if (cam_was_scanning["cam_was_scanning"] == False):
+                                        cam_was_scanning["cam_was_scanning"] = True
+                                        camera_connector.quick_init_camera()
+                                else:
+                                    if (cam_was_scanning["cam_was_scanning"] == True):
+                                        cam_was_scanning["cam_was_scanning"] = False
+                                        camera_connector.extract_data()
                         if msg:
                             app_context["message_box"](msg)
                     app_context["window"].after(0, show_mega_ack)
