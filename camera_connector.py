@@ -8,6 +8,7 @@ from models import app_context
 from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice
 from tkinter import Toplevel, Label, W
+import datetime
 
 def connect():
     if app_context["camera_data"]["system"] is None:
@@ -38,7 +39,9 @@ def extract_data():
         app_context["message_box"]("No cam to extract data from")
         return
     data = cam.stop_acquire()
-    np.save("data.npy", data)
+    now = datetime.datetime.now()
+    formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+    np.save(f"scan_{formatted_time}.npy", data)
     cam.preview.close()
     app_context["message_box"]("Finished saving data")
 

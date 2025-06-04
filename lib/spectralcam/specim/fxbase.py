@@ -140,8 +140,8 @@ class FXBase(DiscoverableGigeDevice):
       self._temp_stop.set()
       self._temp_thread.join()
       self.gvcp.disconnect()
-    if self.preview != None:
-      self.preview.hide()
+    if hasattr(self, 'preview') and self.preview is not None:
+        self.preview.hide()
     print("FX: Device closed")
     return True
 
