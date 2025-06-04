@@ -10,53 +10,81 @@ from PyQt5.QtCore import Qt, QRect
 class CropLabel(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.start_point = None
-        self.end_point = None
-        self.rect = None
-        self.drawing = False
+        self.img_height = 1
+        self.img_width = 1
         self.display_pixmap = None
+        self.top_line = 50
+        self.bottom_line = 150
+        self.dragging = None
+        self.line_margin = 8
+
+        self.x_offset = 0
+        self.y_offset = 0
+        self.scaled_pixmap_height = 1
+        self.scaled_pixmap_width = 1
 
     def setPixmap(self, pixmap):
         super().setPixmap(pixmap)
         self.display_pixmap = pixmap
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.start_point = event.pos()
-            self.end_point = event.pos()
-            self.drawing = True
-            self.update()
-
-    def mouseMoveEvent(self, event):
-        if self.drawing:
-            self.end_point = event.pos()
-            self.update()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton and self.drawing:
-            self.end_point = event.pos()
-            self.drawing = False
-            self.rect = QRect(self.start_point, self.end_point).normalized()
+        if pixmap:
+            self.scaled_pixmap_width = pixmap.width()
+            self.scaled_pixmap_height = pixmap.height()
+            self.img_width = pixmap.width()
+            self.img_height = pixmap.height()
+            self.top_line = int(self.img_height * 0.1)
+            self.bottom_line = int(self.img_height * 0.9)
             self.update()
 
     def paintEvent(self, event):
         super().paintEvent(event)
-        if self.start_point and self.end_point:
+        if self.display_pixmap:
+            label_w = self.width()
+            label_h = self.height()
+            pix_w = self.display_pixmap.width()
+            pix_h = self.display_pixmap.height()
+            self.x_offset = (label_w - pix_w) // 2
+            self.y_offset = (label_h - pix_h) // 2
+
             painter = QPainter(self)
-            painter.setPen(QPen(Qt.red, 2, Qt.DashLine))
-            rect = QRect(self.start_point, self.end_point).normalized()
-            painter.drawRect(rect)
+            painter.fillRect(self.x_offset, self.y_offset, pix_w, self.top_line, Qt.darkGray)
+            painter.fillRect(self.x_offset, self.y_offset + self.bottom_line, pix_w, pix_h - self.bottom_line, Qt.darkGray)
+            pen = QPen(Qt.gray, 4)
+            painter.setPen(pen)
+            painter.drawLine(self.x_offset, self.y_offset + self.top_line, self.x_offset + pix_w, self.y_offset + self.top_line)
+            painter.drawLine(self.x_offset, self.y_offset + self.bottom_line, self.x_offset + pix_w, self.y_offset + self.bottom_line)
+
+    def mousePressEvent(self, event):
+        y = event.y() - self.y_offset
+        if 0 <= y <= self.scaled_pixmap_height:
+            if abs(y - self.top_line) < self.line_margin:
+                self.dragging = 'top'
+            elif abs(y - self.bottom_line) < self.line_margin:
+                self.dragging = 'bottom'
+            else:
+                self.dragging = None
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            y = event.y() - self.y_offset
+            y = max(0, min(y, self.scaled_pixmap_height))
+            if self.dragging == 'top':
+                self.top_line = max(0, min(y, self.bottom_line - 10))
+            elif self.dragging == 'bottom':
+                self.bottom_line = min(self.scaled_pixmap_height, max(y, self.top_line + 10))
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        self.dragging = None
 
     def get_crop_rect(self):
-        if self.rect:
-            return self.rect
-        return None
+        return QRect(0, self.top_line, self.img_width, self.bottom_line - self.top_line)
+
 
 class ScanViewer(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Scan Editor")
-        self.resize(900, 700)
+        self.resize(900, 800)
         self.reshaped_data = None
         self.rgb = None
 
@@ -121,31 +149,35 @@ class ScanViewer(QMainWindow):
                 self.label.setPixmap(pixmap)
                 self.crop_button.setEnabled(True)
             except Exception as e:
-                self.label.setText(f"Fout bij laden: {e}")
+                print(e)
+                self.label.setText(f"Error loading: {e}")
 
     def crop_and_save(self):
         crop_rect = self.label.get_crop_rect()
         if crop_rect and self.rgb is not None:
-            # Map crop_rect from displayed pixmap to original image coordinates
             pixmap = self.label.display_pixmap
             if pixmap is None:
                 return
             pixmap_size = pixmap.size()
             img_h, img_w, _ = self.rgb.shape
-            scale_x = img_w / pixmap_size.width()
             scale_y = img_h / pixmap_size.height()
-            x1 = int(crop_rect.left() * scale_x)
             y1 = int(crop_rect.top() * scale_y)
-            x2 = int(crop_rect.right() * scale_x)
-            y2 = int(crop_rect.bottom() * scale_y)
-            # Ensure bounds
-            x1, x2 = max(0, min(x1, x2)), min(img_w, max(x1, x2))
+            y2 = int((crop_rect.top() + crop_rect.height()) * scale_y)
+            x1 = 0
+            x2 = img_w
             y1, y2 = max(0, min(y1, y2)), min(img_h, max(y1, y2))
+            if y2 - y1 == 0:
+                self.label.setText("Invalid crop region selected.")
+                return
             cropped = self.reshaped_data[y1:y2, x1:x2, :]
+            if cropped.size == 0:
+                self.label.setText("Cropped region is empty.")
+                return
             save_path, _ = QFileDialog.getSaveFileName(self, "Save Cropped Scan", "", "NumPy Files (*.npy)")
             if save_path:
                 np.save(save_path, cropped)
                 self.label.setText(f"Cropped scan saved: {save_path}")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
