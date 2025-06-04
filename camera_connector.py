@@ -26,9 +26,9 @@ def quick_init_camera():
     if not cam:
         return app_context["message_box"]("No cam to quick init")
 
-    cam.set_defaults(frame_rate=30.0, exposure_time=30000.0)
-    cam.set("BinningHorizontal", 2)
+    cam.set_defaults()
     cam.open_stream()
+    cam.init_preview()
     cam.show_preview()
     cam.start_acquire(True)
 
@@ -38,11 +38,8 @@ def extract_data():
         app_context["message_box"]("No cam to extract data from")
         return
     data = cam.stop_acquire()
-    thread = threading.Thread(target = save_data, args = (data, ))
-    thread.start()
-
-def save_data(data):
     np.save("data.npy", data)
+    cam.preview.close()
     app_context["message_box"]("Finished saving data")
 
 def show_info(master):

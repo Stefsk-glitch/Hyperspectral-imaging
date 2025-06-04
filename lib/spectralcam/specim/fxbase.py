@@ -30,6 +30,7 @@ class FXBase(DiscoverableGigeDevice):
     self._gvsp_port = 0
     self._gvsp_p = None
     self._is_acquiring = False
+    self.preview_factory = preview_factory
 
     # Buffer to save data to
     self.buffer = deque()
@@ -70,21 +71,6 @@ class FXBase(DiscoverableGigeDevice):
     self._temp_thread = threading.Thread(target=self._check_temperature_loop)
     self._temp_thread.start()
 
-    # Initialize preview
-    self.preview = None
-    spectral = self.get("Height")
-    self.red_band = round(spectral * 1/6)
-    self.green_band = round(spectral * 3/6)
-    self.blue_band = round(spectral * 5/6)
-    if preview_factory != None:
-      binning = self.get("BinningHorizontal")
-      width = self.get("Width")
-      width = width * binning
-      height = round(width * 0.75)
-      self.preview = preview_factory.create(width, height, f"Preview {self.DEV_INFO_MODEL}")
-    if self._verbose:
-      print("FX: Preview window initialized")
-
   def __del__(self) -> None:
     if self.is_open:
       self.close()
@@ -123,6 +109,19 @@ class FXBase(DiscoverableGigeDevice):
 
   frame_cb = None
   """Frame callback function. It is called every time a new frame is received."""
+
+  def init_preview(self) -> None:
+    self.preview = None
+    spectral = self.get("Height")
+    self.red_band = round(spectral * 1/6)
+    self.green_band = round(spectral * 3/6)
+    self.blue_band = round(spectral * 5/6)
+    if self.preview_factory != None:
+      binning = self.get("BinningHorizontal")
+      width = self.get("Width")
+      width = width * binning
+      height = round(width * 0.75)
+      self.preview = self.preview_factory.create(width, height, f"Preview {self.DEV_INFO_MODEL}")
 
   def close(self) -> None:
     """
@@ -248,18 +247,17 @@ class FXBase(DiscoverableGigeDevice):
       pass
     else:
       raise TypeError("Invalid feature type")
-    if self.verbose or self.print_info:
-      print(f"Name:         {feature.node.name}")
-      print(f"Display name: {feature.node.display_name}")
-      print(f"Type:         {type(feature).__name__}")
-      print(f"Description:  {feature.node.description}")
-      print(f"Tooltip:      {feature.node.tooltip}")
-      print(f"Visibility:   {feature.node.visibility}")
-      if isinstance(feature, IEnumeration):
-        print("Enumerate entries:")
-        for entry in feature.entries:
-          symbolic = entry.symbolic + ":"
-          print(f"  {entry.value:2} {symbolic:16} {entry.node.description}")
+    return_string = ""
+    return_string += f"Name: {feature.node.name}\n"
+    return_string += f"Display name: {feature.node.display_name}\n"
+    return_string += f"Type: {type(feature).__name__}\n"
+    return_string += f"Description: {feature.node.description}\n"
+    if isinstance(feature, IEnumeration):
+      for entry in feature.entries:
+        symbolic = entry.symbolic + ":"
+        return_string += f"{entry.value:2} {symbolic:16} {entry.node.description}\n"
+    
+    return return_string
 
   def get(self, feature: Union[str, IValue]) -> any:
     """

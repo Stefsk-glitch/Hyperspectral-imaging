@@ -5,10 +5,11 @@ import threading
 import sys
 import logging
 from app import run_app
-from models import command_queue, app_context
+from models import command_queue, app_context, esp32_status, pipeline, stopped
 from queue import Empty
-from models import command_queue, esp32_status
 from pathlib import Path
+from time import sleep
+import camera_connector
 
 log_path = Path(__file__).parent / "app_log.txt"
 
@@ -60,7 +61,7 @@ async def handler(websocket):
                         msg = ""
                         print(mega_ack)
                         if "uno_ack" in mega_ack:
-                            if mega_ack["uno_ack"] == "start_scan":
+                            if mega_ack["uno_ack"] == "start_scan" and pipeline["visualize"] == False:
                                 msg = "✅ Started scan"
                             elif mega_ack["uno_ack"] == "stop_scan":
                                 msg = "🛑 Stopped scan"
@@ -69,7 +70,7 @@ async def handler(websocket):
                             elif "speed" in mega_ack["uno_ack"]:
                                 msg = "Speed set" 
                         
-                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys():
+                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys() and pipeline["visualize"] == False:
                             msg = (
                                 f"🌡️ Temperature 1: {mega_ack['t1']} °C\n"
                                 f"🌡️ Temperature 2: {mega_ack['t2']} °C\n"
@@ -77,7 +78,16 @@ async def handler(websocket):
                                 f"📏 Length: {mega_ack['length']}\n"
                                 f"🚀 Speed: {mega_ack['speed']}"
                             )
-                        app_context["message_box"](msg)
+                        
+                        elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys() and pipeline["visualize"] == True:
+                            if (mega_ack['status']) == "Waiting":
+                                stopped["stop"] = True
+                            if (mega_ack['status']) == "Scanning":
+                                camera_connector.quick_init_camera()
+                            else:
+                                camera_connector.extract_data()
+                        if msg:
+                            app_context["message_box"](msg)
                     app_context["window"].after(0, show_mega_ack)
 
             await asyncio.sleep(0.1)
@@ -97,5 +107,5 @@ if __name__ == "__main__":
     # the daemon=True flag ensures the thread will exit when the main program exits.
     websocketServerThread = threading.Thread(target=launchWebsocketServerOnNewThread, daemon=True)
     websocketServerThread.start()
-    
+
     run_app()
