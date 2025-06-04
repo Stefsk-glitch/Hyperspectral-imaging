@@ -135,7 +135,7 @@ def run_app():
             
         command_queue.put("start_scan")
     
-        thread = threading.Thread(target=check_status)
+        thread = threading.Thread(target=check_status, daemon=True)
         thread.start()
 
     def set_connection_state(connected: ConnectionState):
