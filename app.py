@@ -121,6 +121,8 @@ def run_app():
 
 
     def start_scan(visualize):
+        if camera_data["system"] is None or camera_data["cam"] is None:
+            app_context["message_box"]("No cam connected. Scan will continue without cam")
         if visualize.get() == 1:
             pipeline["visualize"] = True
         else:
@@ -160,7 +162,7 @@ def run_app():
         logging.info("destroy")
         window.destroy()
         if (camera_data["system"]):
-            system = camera_data["system"]
+            system: GCSystem = camera_data["system"]
             system.close()
         exit()
 
