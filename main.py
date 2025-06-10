@@ -10,6 +10,8 @@ from queue import Empty
 from pathlib import Path
 from time import sleep
 import camera_connector
+from calibration import calibrate_white
+from calibration_helpers import calibrate_hyperspectral_scan
 
 log_path = Path(__file__).parent / "app_log.txt"
 
@@ -76,6 +78,8 @@ async def handler(websocket):
 
                             if previous_status == "Homimg" and current_status == "Accelerating":
                                 print("time to get white ref")
+                                #camera_connector.quick_init_camera()
+                                #calibrate_white()
 
                             last_status["value"] = current_status
 
@@ -90,7 +94,9 @@ async def handler(websocket):
                                     else:
                                         if (cam_was_scanning["cam_was_scanning"] == True):
                                             cam_was_scanning["cam_was_scanning"] = False
-                                            camera_connector.extract_data()
+                                            path = camera_connector.extract_data()
+                                            #calibrated_data = calibrate_hyperspectral_scan(path, "calibration/white.npy", "calibration/black.npy")
+
                             
                             if pipeline["visualize"] == False:
                                 msg = (
