@@ -44,6 +44,7 @@ def extract_data():
     np.save(f"scan_{formatted_time}.npy", data)
     cam.preview.close()
     app_context["message_box"]("Finished saving data")
+    return f"scan_{formatted_time}.npy"
 
 def show_info(master):
     win = Toplevel(master)

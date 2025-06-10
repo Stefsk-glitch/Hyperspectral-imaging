@@ -5,35 +5,7 @@ import time
 import numpy as np
 import os
 
-def open_calibration_window(master):
-    win = Toplevel(master)
-    win.title("Calibrate Camera")
-
-    cam: FX10 = app_context["camera_data"]["cam"]
-    Button(win, text="Start black calibration", command=lambda:calibrate_black()).pack(padx="5")
-    Button(win, text="Start white calibration", command=lambda:calibrate_white()).pack(pady="5")
-
-    def calibrate_black():
-        cam.set_defaults()
-        cam.open_stream()
-        cam.start_acquire(True)
-        time.sleep(1)
-        data = cam.stop_acquire()
-        np.save("calibration/black.npy", data)
-        calculate_reference_average("calibration/black.npy")
-        app_context["message_box"]("Calibrated black reference")
-    
-    def calibrate_white():
-        cam.set_defaults()
-        cam.open_stream()
-        cam.start_acquire(True)
-        time.sleep(1)
-        data = cam.stop_acquire()
-        np.save("calibration/white.npy", data)
-        calculate_reference_average("calibration/white.npy")
-        app_context["message_box"]("Calibrated white reference")
-        
-    def calculate_reference_average(input_file, output_file=None, num_pixels=500):
+def calculate_reference_average(input_file, output_file=None, num_pixels=500):
         """
         Berekent het gemiddelde van pixels uit het midden van een hyperspectraal beeld.
         
@@ -112,3 +84,34 @@ def open_calibration_window(master):
             return None
         
         return average_spectrum
+
+def calibrate_black():
+        cam: FX10 = app_context["camera_data"]["cam"]
+        cam.set_defaults()
+        cam.open_stream()
+        cam.start_acquire(True)
+        time.sleep(1)
+        data = cam.stop_acquire()
+        np.save("calibration/black.npy", data)
+        calculate_reference_average("calibration/black.npy")
+        app_context["message_box"]("Calibrated black reference")
+    
+def calibrate_white():
+    cam: FX10 = app_context["camera_data"]["cam"]
+    cam.set_defaults()
+    cam.open_stream()
+    cam.start_acquire(True)
+    time.sleep(1)
+    data = cam.stop_acquire()
+    np.save("calibration/white.npy", data)
+    calculate_reference_average("calibration/white.npy")
+    app_context["message_box"]("Calibrated white reference")
+
+def open_calibration_window(master):
+    win = Toplevel(master)
+    win.title("Calibrate Camera")
+
+    Button(win, text="Start black calibration", command=lambda:calibrate_black()).pack(padx="5")
+    Button(win, text="Start white calibration", command=lambda:calibrate_white()).pack(pady="5")
+        
+    
