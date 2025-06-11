@@ -6,6 +6,7 @@ from settings import open_settings_window
 from models import app_context, command_queue, esp32_status, stopped, pipeline
 from enums import ConnectionState
 from lib.spectralcam.gentl import GCDevice, GCInterface, GCSystem
+from lib.spectralcam.specim.fxbase import FXBase
 from typing import Tuple
 from models import app_context, camera_data
 import time
@@ -26,7 +27,7 @@ def start_scan_editor():
 def run_app():
     window = Tk()
     app_context["window"] = window
-    window.geometry("500x550")
+    window.geometry("500x570")
     window.title("FX10 Configuration App")
 
     main_frame = tk.Frame(window)
@@ -45,6 +46,8 @@ def run_app():
 
     cam_connection_label = Label(main_frame, text="Connection status: Disconnected")
     cam_connection_label.pack(anchor="w")
+    cam_connection_explanation_label = Label(main_frame, text="Please never disconnect the cable while connected to the camera.\nClose this app window to disconnect the camera.")
+    cam_connection_explanation_label.pack(anchor="w")
 
     cam_actions_row = tk.Frame(main_frame)
     cam_actions_row.pack(fill="x", pady=2)
@@ -165,6 +168,7 @@ def run_app():
         logging.info("destroy")
         window.destroy()
         if (camera_data["system"]):
+            print("closing system")
             system: GCSystem = camera_data["system"]
             system.close()
         exit()
@@ -181,11 +185,17 @@ def run_app():
                 app_context["message_box"]("Found multiple cams. This app does not support multiple cams yet")
                 set_connection_state(ConnectionState.DISCONNECTED)
             case event_handler.Events.NO_CAM:
-                app_context["message_box"]("No cams found")
+                app_context["message_box"]("No camera's found. It can take a minute to connect")
                 set_connection_state(ConnectionState.DISCONNECTED)
             case event_handler.Events.CAM_DISCONNECTED:
                 set_connection_state(ConnectionState.DISCONNECTED)
                 set_buttons(DISABLED)
+                system: GCSystem = camera_data["system"]
+                system.close()
+                cam: FXBase = camera_data["cam"]
+                cam.close()
+                camera_data["system"] = None
+                camera_data["cam"] = None
                 app_context["message_box"]("Connection with camera lost")
 
     def set_buttons(state):
