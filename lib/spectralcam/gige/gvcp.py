@@ -19,6 +19,8 @@ from genicam.genapi import AbstractPort, EAccessMode
 from ...spectralcam.utils import *
 from ...spectralcam.exceptions import *
 
+from event_handler import fire_event, Events
+
 # Misc general GVCP constants
 GVCP_KEY = 0x42
 GVCP_PORT = 3956
@@ -1256,7 +1258,10 @@ class GVCP:
 
   def _exec_request(self, request: GVCPCmd, retry: int) -> GVCPAck:
     response = None
-    req_len = self._soc.send(request.data)
+    try:
+      req_len = self._soc.send(request.data)
+    except OSError:
+      fire_event(Events.CAM_DISCONNECTED, None)
     if self.debug:
       print(f"GVCP: Sent {request.cmd_name}, id: {request.req_id}, length: {req_len} bytes")
     if request.ack:
@@ -1311,7 +1316,7 @@ class GVCP:
         if ccp_status != VAL_CONTROL_ACCESS:
           self._soc.close()
           self._soc = None
-          raise NotConnectedError("GVCP ERROR: Connection lost")
+          fire_event(Events.CAM_DISCONNECTED, None)
         elif self.debug:
           print("GVCP: Sent heartbeat refresh packet")
     if self.verbose:

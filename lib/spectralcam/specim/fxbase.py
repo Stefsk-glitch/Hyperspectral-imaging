@@ -138,9 +138,9 @@ class FXBase(DiscoverableGigeDevice):
           self.stop_acquire()
           time.sleep(0.05) # Weird behaviour of FX17 camera...
         self.close_stream()
-      self._temp_stop.set()
-      self._temp_thread.join()
       self.gvcp.disconnect()
+    self._temp_stop.set()
+    self._temp_thread.join()
     if hasattr(self, 'preview') and self.preview is not None:
         self.preview.hide()
     print("FX: Device closed")
