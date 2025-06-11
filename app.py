@@ -190,13 +190,14 @@ def run_app():
             case event_handler.Events.CAM_DISCONNECTED:
                 set_connection_state(ConnectionState.DISCONNECTED)
                 set_buttons(DISABLED)
-                system: GCSystem = camera_data["system"]
-                system.close()
-                cam: FXBase = camera_data["cam"]
-                cam.close()
-                camera_data["system"] = None
-                camera_data["cam"] = None
-                app_context["message_box"]("Connection with camera lost")
+                if camera_data["cam"] is not None and camera_data["system"] is not None:
+                    cam: FXBase = camera_data["cam"]
+                    cam.close()
+                    system: GCSystem = camera_data["system"]
+                    system.close()
+                    camera_data["system"] = None
+                    camera_data["cam"] = None
+                    app_context["message_box"]("Connection with camera lost")
 
     def set_buttons(state):
         if state is NORMAL:

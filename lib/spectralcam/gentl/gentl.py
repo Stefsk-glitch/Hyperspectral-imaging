@@ -592,7 +592,6 @@ class GCSystem:
       open_device = inf.open_device(dev_id, device_type, GVCP_PORT, self.preview_factory)
       open_interface = inf
       if open_device.is_open:
-        print(f"Connected to {dev_info.device.mac_address}")
         fire_event(Events.CAM_FOUND, (open_device, open_interface))
 
     # Found more than 1 device

@@ -1258,10 +1258,11 @@ class GVCP:
 
   def _exec_request(self, request: GVCPCmd, retry: int) -> GVCPAck:
     response = None
-    try:
-      req_len = self._soc.send(request.data)
-    except OSError:
-      fire_event(Events.CAM_DISCONNECTED, None)
+    # try:
+    req_len = self._soc.send(request.data)
+    # except Exception:
+      # fire_event(Events.CAM_DISCONNECTED, None)
+      # return
     if self.debug:
       print(f"GVCP: Sent {request.cmd_name}, id: {request.req_id}, length: {req_len} bytes")
     if request.ack:
@@ -1317,6 +1318,7 @@ class GVCP:
           self._soc.close()
           self._soc = None
           fire_event(Events.CAM_DISCONNECTED, None)
+          return
         elif self.debug:
           print("GVCP: Sent heartbeat refresh packet")
     if self.verbose:
