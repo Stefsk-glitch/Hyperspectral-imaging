@@ -5,7 +5,7 @@ import threading
 import sys
 import logging
 from app import run_app
-from models import command_queue, app_context, esp32_status, pipeline, stopped, cam_was_scanning, camera_data, last_status
+from models import command_queue, app_context, esp32_status, pipeline, stopped, cam_was_scanning, camera_data, last_status, gotWhiteRef
 from queue import Empty
 from pathlib import Path
 from time import sleep
@@ -77,11 +77,17 @@ async def handler(websocket):
                         elif {"t1", "t2", "status", "length", "speed"} <= mega_ack.keys():
                             current_status = mega_ack['status']
                             previous_status = last_status.get("value")
+                            
+                            print(str(current_status) + " current")
+                            print(str(previous_status) + " previous")
 
-                            if previous_status == "Homimg" and current_status == "Accelerating":
+                            if str(previous_status) == "Accelerating" and str(current_status) == "Accelerating":
+                                gotWhiteRef["value"] = False
+
+                            if str(previous_status) == "Homing" and str(current_status) == "Accelerating" and gotWhiteRef.get("value") == False:
+                                gotWhiteRef["value"] = True
                                 print("time to get white ref")
-                                #camera_connector.quick_init_camera()
-                                #calibrate_white()
+                                calibrate_white()
 
                             last_status["value"] = current_status
 
@@ -98,11 +104,7 @@ async def handler(websocket):
                                             cam_was_scanning["cam_was_scanning"] = False
                                             path = camera_connector.extract_data()
                                             
-                                            calibrated_data = calibrate_hyperspectral_scan(path, "calibration/white.npy", "calibration/black.npy")
-
-                                            now = datetime.datetime.now()
-                                            formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-                                            np.save(f"calibrated_scan_{formatted_time}.npy", calibrated_data)
+                                            calibrate_hyperspectral_scan(path, "calibration/white_gemiddelde.npy", "calibration/black_gemiddelde.npy")
                             
                             if pipeline["visualize"] == False:
                                 msg = (

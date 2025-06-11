@@ -92,6 +92,10 @@ def calibrate_black():
         cam.start_acquire(True)
         time.sleep(1)
         data = cam.stop_acquire()
+
+        if not os.path.exists("calibration"):
+            os.makedirs("calibration")
+
         np.save("calibration/black.npy", data)
         calculate_reference_average("calibration/black.npy")
         app_context["message_box"]("Calibrated black reference")
@@ -103,6 +107,10 @@ def calibrate_white():
     cam.start_acquire(True)
     time.sleep(1)
     data = cam.stop_acquire()
+
+    if not os.path.exists("calibration"):
+        os.makedirs("calibration")
+
     np.save("calibration/white.npy", data)
     calculate_reference_average("calibration/white.npy")
     app_context["message_box"]("Calibrated white reference")
