@@ -155,4 +155,4 @@ def calibrate_hyperspectral_scan(scan_file, white_ref_file, black_ref_file, outp
         print(f"Fout bij opslaan: {e}")
         return None
     
-    return calibrated_data
+    return output_file

@@ -11,9 +11,12 @@ from pathlib import Path
 from time import sleep
 import camera_connector
 from calibration import calibrate_white
-from calibration_helpers import calibrate_hyperspectral_scan
+from calibration_helpers import calibrate_hyperspectral_scan, calculate_reference_average
 import numpy as np
 import datetime
+import tensorflow as tf
+from pixel_recognition import Pixel_recogniser
+from pixel_helpers import load_file
 
 log_path = Path(__file__).parent / "app_log.txt"
 
@@ -104,7 +107,20 @@ async def handler(websocket):
                                             cam_was_scanning["cam_was_scanning"] = False
                                             path = camera_connector.extract_data()
                                             
-                                            calibrate_hyperspectral_scan(path, "calibration/white_gemiddelde.npy", "calibration/black_gemiddelde.npy")
+                                            path_to_calibrated_data = calibrate_hyperspectral_scan(path, "calibration/white_gemiddelde.npy", "calibration/black_gemiddelde.npy")
+
+                                            pixel_recogniser = Pixel_recogniser(pre_loaded=True)
+                                            
+                                            test_array, H, W, B = load_file(path_to_calibrated_data)
+
+                                            predicted_classes = pixel_recogniser.predict_multiple_pixels(test_array)
+                                            pixel_recogniser.visualize_labeled_regions(test_array, H, W)
+
+                                            pixel_recogniser.export_all_regions(test_array, H, W, min_region_size=200) 
+
+                                            pixel_recogniser.visualize_labeled_regions_from_map('region_exports/grass_regions/grass_region_map.npy', 'grass')
+                                            pixel_recogniser.visualize_labeled_regions_from_map('region_exports/onion_regions/onion_region_map.npy', 'onion')
+                                            pixel_recogniser.visualize_labeled_regions_from_map('region_exports/cloth_regions/cloth_region_map.npy', 'cloth')
                             
                             if pipeline["visualize"] == False:
                                 msg = (
