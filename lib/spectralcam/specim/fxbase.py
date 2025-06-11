@@ -13,6 +13,7 @@ from ...spectralcam.gige import GVCP, GVCPDiscoveryAck, PortGVCP, GVCP_PORT, gvs
 from ...spectralcam.preview import PreviewFactory
 from ...spectralcam.gentl import GCDeviceInfo, DiscoverableGigeDevice
 from ...spectralcam.exceptions import *
+from event_handler import fire_event, Events
 
 class FXBase(DiscoverableGigeDevice):
   """
@@ -514,6 +515,7 @@ class FXBase(DiscoverableGigeDevice):
 
   def _check_connection(self) -> None:
     if not self.is_open:
+      fire_event(Events.CAM_DISCONNECTED)
       raise NotConnectedError(f"Not connected, ")
 
   def _check_stream_channel(self) -> None:
