@@ -179,6 +179,8 @@ cython_debug/
 
 app_log.txt
 *.npy
+!pixel_scaler.npy
+!label_classes.npy
 
 # Detectron 2
 detectron2/
