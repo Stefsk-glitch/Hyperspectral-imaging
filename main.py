@@ -12,6 +12,8 @@ from time import sleep
 import camera_connector
 from calibration import calibrate_white
 from calibration_helpers import calibrate_hyperspectral_scan
+import numpy as np
+import datetime
 
 log_path = Path(__file__).parent / "app_log.txt"
 
@@ -95,8 +97,12 @@ async def handler(websocket):
                                         if (cam_was_scanning["cam_was_scanning"] == True):
                                             cam_was_scanning["cam_was_scanning"] = False
                                             path = camera_connector.extract_data()
-                                            #calibrated_data = calibrate_hyperspectral_scan(path, "calibration/white.npy", "calibration/black.npy")
+                                            
+                                            calibrated_data = calibrate_hyperspectral_scan(path, "calibration/white.npy", "calibration/black.npy")
 
+                                            now = datetime.datetime.now()
+                                            formatted_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+                                            np.save(f"calibrated_scan_{formatted_time}.npy", calibrated_data)
                             
                             if pipeline["visualize"] == False:
                                 msg = (
