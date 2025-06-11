@@ -184,8 +184,9 @@ def run_app():
                 app_context["message_box"]("No cams found")
                 set_connection_state(ConnectionState.DISCONNECTED)
             case event_handler.Events.CAM_DISCONNECTED:
-                app_context["message_box"]("Connection with camera lost")
                 set_connection_state(ConnectionState.DISCONNECTED)
+                set_buttons(DISABLED)
+                app_context["message_box"]("Connection with camera lost")
 
     def set_buttons(state):
         if state is NORMAL:
