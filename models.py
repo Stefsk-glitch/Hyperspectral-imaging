@@ -17,3 +17,4 @@ stopped = {"stop": False}
 pipeline = {"visualize": False}
 cam_was_scanning = {"cam_was_scanning": False}
 last_status = {"value": None}
+gotWhiteRef = {"value": False}
