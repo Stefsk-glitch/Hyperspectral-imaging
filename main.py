@@ -111,17 +111,27 @@ async def handler(websocket):
 
                                             pixel_recogniser = Pixel_recogniser(pre_loaded=True)
                                             
+                                            print("done with model init")
+
                                             test_array, H, W, B = load_file(path_to_calibrated_data)
 
-                                            predicted_classes = pixel_recogniser.predict_multiple_pixels(test_array)
+                                            print("loaded file")
+
+                                            pixel_recogniser.predict_multiple_pixels(test_array)
                                             pixel_recogniser.visualize_labeled_regions(test_array, H, W)
 
+                                            print("done predicting")
+
                                             pixel_recogniser.export_all_regions(test_array, H, W, min_region_size=200) 
+
+                                            print("exported all regions")
 
                                             pixel_recogniser.visualize_labeled_regions_from_map('region_exports/grass_regions/grass_region_map.npy', 'grass')
                                             pixel_recogniser.visualize_labeled_regions_from_map('region_exports/onion_regions/onion_region_map.npy', 'onion')
                                             pixel_recogniser.visualize_labeled_regions_from_map('region_exports/cloth_regions/cloth_region_map.npy', 'cloth')
                             
+                                            print("done visualizing")
+
                             if pipeline["visualize"] == False:
                                 msg = (
                                 f"🌡️ Temperature 1: {mega_ack['t1']} °C\n"

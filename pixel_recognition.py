@@ -14,6 +14,8 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.layers import BatchNormalization, Dropout, LeakyReLU
 import matplotlib.patches as mpatches
 
+from datetime import datetime
+
 import matplotlib.pyplot as plt
 from scipy.ndimage import label
 import os
@@ -30,11 +32,13 @@ class Pixel_recogniser:
                  pre_loaded=False):
 
         if not pre_loaded:
+            print("Inside load_model()")
             pixel_data = []
             for folder_path, label in pixel_data_folders:
                 pixel_data.extend(collect_folder_with_labels(folder_path, label))
             self.load_model(pixel_data)
         else:
+            print("Inside load_premade_model()")
             self.load_premade_model()
 
     #data should consist of a array of type [[file_path, object_name], [file_path, object_name]]
@@ -130,8 +134,20 @@ class Pixel_recogniser:
     def predict_multiple_pixels(self, array, amount=0):
         if amount > 0:
             array = array[:amount]
+    
+        print("Original array shape:", array.shape)
+        print("Any NaNs in array?", np.isnan(array).any())
+
         array_scaled = self.scaler.transform(array)
+        print("Scaled array shape:", array_scaled.shape)
+        print("Any NaNs in scaled array?", np.isnan(array_scaled).any())
+        
+        print("Model input shape:", self.model.input_shape)
+
+        print("Starting prediction...")
         prediction = self.model.predict(array_scaled)
+        print("Finished prediction.")
+
         predicted_indices = np.argmax(prediction, axis=1)
         predicted_classes = self.encoder.inverse_transform(predicted_indices)
         return predicted_classes
@@ -165,66 +181,92 @@ class Pixel_recogniser:
     import matplotlib.patches as mpatches
 
     def visualize_labeled_regions(self, hyperspectral_array, H, W, min_region_size=100):
+        print("Starting visualization...")
+        print(f"Input array shape: {hyperspectral_array.shape}")
+        print(f"Target image dimensions: H={H}, W={W}")
+        
         predicted_labels = self.predict_multiple_pixels(hyperspectral_array)
+        print(f"Predicted {len(predicted_labels)} labels")
+
         label_image = predicted_labels.reshape(H, W)
+        print("Reshaped predicted labels into image")
 
         unique_classes = np.unique(predicted_labels)
+        print(f"Unique predicted classes: {unique_classes}")
 
-        # Maak een lege RGB-afbeelding met zwarte achtergrond
+        # Create black RGB background
         overlay = np.zeros((H, W, 3), dtype=np.uint8)
 
-        # Unieke kleuren voor klassen
+        # Assign unique colors to classes
         cmap = plt.get_cmap('tab10')
         class_colors = {cls: np.array(cmap(i % 10)[:3]) * 255 for i, cls in enumerate(unique_classes)}
+        print(f"Assigned colors to classes")
 
         plt.figure(figsize=(10, 8))
         ax = plt.gca()
 
         for class_label in unique_classes:
+            print(f"Processing class: {class_label}")
             class_mask = (label_image == class_label)
             labeled_array, num_features = label(class_mask)
+            print(f"Found {num_features} features for class {class_label}")
 
             for region_id in range(1, num_features + 1):
                 region_mask = (labeled_array == region_id)
                 region_size = np.sum(region_mask)
+                print(f"  Region #{region_id} size: {region_size}")
 
                 if region_size >= min_region_size:
-                    # Kleur de regio in
+                    print(f"  → Region #{region_id} is large enough, adding to overlay")
                     overlay[region_mask] = class_colors[class_label]
 
-                    # Vind het middelpunt van de regio
                     coords = np.argwhere(region_mask)
                     y_mean, x_mean = coords.mean(axis=0).astype(int)
 
-                    # Tekst toevoegen: klasse + ID
                     ax.text(x_mean, y_mean, f"{class_label[:6]} #{region_id}", color='white',
-                            fontsize=7, ha='center', va='center', bbox=dict(facecolor='black', alpha=0.5, boxstyle='round'))
+                            fontsize=7, ha='center', va='center',
+                            bbox=dict(facecolor='black', alpha=0.5, boxstyle='round'))
 
         ax.imshow(overlay)
         ax.set_title("Regio's met labels per klasse en ID")
         ax.axis('off')
 
-        # Legenda
+        # Add legend
         patches = [mpatches.Patch(color=class_colors[cls]/255, label=cls) for cls in unique_classes]
         plt.legend(handles=patches, loc='lower right')
         plt.tight_layout()
-        plt.show()
-    
+        print("Finished drawing, saving plot...")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"visualization_output_{timestamp}.png"
+        plt.savefig(filename)
+        print(f"Plot saved to {filename}")
+        plt.close()
+
     def visualize_labeled_regions_from_map(self, region_map_path, class_name):
-        region_map = np.load(region_map_path)
-        
         from matplotlib.colors import ListedColormap
+
+        # Load region map
+        region_map = np.load(region_map_path)
         max_val = np.max(region_map)
+
+        # Create custom colormap
         cmap = plt.get_cmap('tab20')
         colors = [(0, 0, 0)] + [cmap(i % 20) for i in range(1, max_val + 1)]
         custom_cmap = ListedColormap(colors)
 
+        # Create plot
         plt.figure(figsize=(10, 8))
         plt.imshow(region_map, cmap=custom_cmap)
         plt.colorbar(ticks=range(max_val + 1), label='Blob ID')
         plt.title(f"Regio's voor klasse: {class_name}")
         plt.axis('off')
-        plt.show()
+
+        # Save with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"region_map_{class_name}_{timestamp}.png"
+        plt.savefig(filename)
+        print(f"Plot saved to {filename}")
+        plt.close()
         
     def export_specific_regions(self, hyperspectral_array, H, W, B, target_class='grass', min_region_size=50, output_dir='grass_regions'):
         # Stap 1: Voorspel labels
