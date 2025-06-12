@@ -11,7 +11,7 @@ from pathlib import Path
 from time import sleep
 import camera_connector
 from calibration import calibrate_white
-from calibration_helpers import calibrate_hyperspectral_scan, calculate_reference_average
+from calibration_helpers import calibrate_hyperspectral_scan
 import numpy as np
 import datetime
 import tensorflow as tf
