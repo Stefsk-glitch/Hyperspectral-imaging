@@ -23,9 +23,9 @@ from pixel_helpers import load_hyperspectral_samples, balance_classes, collect_f
 class Pixel_recogniser:
     def __init__(self, 
                  pixel_data_folders = [
-                     ('/Users/koen/Documents/TI Periode 3.4/pixel_trainer/model3/Cloth_2', 'cloth'),
-                     ('/Users/koen/Documents/TI Periode 3.4/pixel_trainer/model3/Grass_2', 'grass'),
-                     ('/Users/koen/Documents/TI Periode 3.4/pixel_trainer/model3/union_2', 'onion'),
+                     ('model3/Cloth_2', 'cloth'),
+                     ('model3/Grass_2', 'grass'),
+                     ('model3/union_2', 'onion'),
                     ],
                  pre_loaded=False):
 
